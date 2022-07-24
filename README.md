@@ -133,20 +133,23 @@ _Type_: `string`
 
 Reason for the change among:
 
-- [`"unsafeCycle"`](#cycles), [`"unsafeException"`](#infinite-recursion),
-  [`"unsafeBigInt"`](#bigint), [`"unsafeToJSON"`](#exceptions-in-tojson),
+- [Exceptions](#exceptions): [`"unsafeCycle"`](#cycles),
+  [`"unsafeException"`](#infinite-recursion), [`"unsafeBigInt"`](#bigint),
+  [`"unsafeToJSON"`](#exceptions-in-tojson),
   [`"unsafeGetter"`](#exceptions-in-getters)
-- [`"descriptorNotWritable"`](#non-writable-properties),
+- [Invalid descriptors](#invalid-descriptors):
+  [`"descriptorNotWritable"`](#non-writable-properties),
   [`"descriptorNotConfigurable"`](#non-configurable-properties)
-- [`"unstableInfinite"`](#nan-and-infinity)
-- [`"ignoredFunction"`](#functions), [`"ignoredUndefined"`](#undefined),
-  [`"ignoredSymbolValue"`](#symbol-values),
+- [Unexpected types](#unexpected-types):
+  [`"unstableInfinite"`](#nan-and-infinity)
+- [Filtered values](#filtered-values): [`"ignoredFunction"`](#functions),
+  [`"ignoredUndefined"`](#undefined), [`"ignoredSymbolValue"`](#symbol-values),
   [`"ignoredSymbolKey"`](#symbol-keys),
   [`"ignoredNotEnumerable"`](#non-enumerable-keys),
   [`"ignoredArrayProperty"`](#array-properties)
-- [`"unresolvedToJSON"`](#tojson), [`"unresolvedClass"`](#classes),
-  [`"unresolvedGetter"`](#getters)
-- [`"maxSize"`](#big-output)
+- [Unresolved values](#unresolved-values): [`"unresolvedToJSON"`](#tojson),
+  [`"unresolvedClass"`](#classes), [`"unresolvedGetter"`](#getters)
+- [Big output](#big-output): [`"maxSize"`](#big-output)
 
 ##### changes[*].error
 
@@ -154,8 +157,8 @@ _Type_: `Error?`
 
 Error that triggered the change. Only present if [`reason`](#changesreason) is
 [`"unsafeException"`](#infinite-recursion),
-[`"unsafeGetter"`](#exceptions-in-getters) or
-[`"unsafeToJSON"`](#exceptions-in-tojson).
+[`"unsafeToJSON"`](#exceptions-in-tojson) or
+[`"unsafeGetter"`](#exceptions-in-getters).
 
 # Changes
 
@@ -238,6 +241,8 @@ const input = new Proxy(
 JSON.stringify(input) // Throws due to proxy
 JSON.stringify(safeJsonValue(input).value) // '{}'
 ```
+
+## Invalid descriptors
 
 ### Non-writable properties
 
