@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import test from 'ava'
 import safeJsonValue from 'safe-json-value'
 import { each } from 'test-each'
@@ -86,7 +87,7 @@ each(
   ],
   ({ title }, { input, output, key }) => {
     test(`Does not recurse if object property key or array comma is over options.maxSize | ${title}`, (t) => {
-      const size = JSON.stringify(output).length
+      const maxSize = JSON.stringify(output).length
       t.deepEqual(safeJsonValue(input), {
         value: output,
         changes: [
@@ -98,7 +99,7 @@ each(
           },
         ],
       })
-      t.deepEqual(safeJsonValue(input, { maxSize: size }), {
+      t.deepEqual(safeJsonValue(input, { maxSize }), {
         value: output,
         changes: [
           {
@@ -106,6 +107,33 @@ each(
             oldValue: undefined,
             newValue: undefined,
             reason: 'maxSize',
+          },
+        ],
+      })
+    })
+  },
+)
+
+each(
+  [
+    {
+      input: { one: undefined, prop: true },
+      output: { prop: true },
+      key: 'one',
+    },
+    { input: [undefined, true], output: [true], key: 0 },
+  ],
+  ({ title }, { input, output, key }) => {
+    test(`Omitted values do not count towards options.maxSize | ${title}`, (t) => {
+      const maxSize = JSON.stringify(output).length
+      t.deepEqual(safeJsonValue(input, { maxSize }), {
+        value: output,
+        changes: [
+          {
+            path: [key],
+            oldValue: undefined,
+            newValue: undefined,
+            reason: 'invalidType',
           },
         ],
       })
