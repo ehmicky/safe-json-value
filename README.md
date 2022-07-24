@@ -78,7 +78,7 @@ _Type_: `number`\
 _Default_: `Number.POSITIVE_INFINITY` (no maximum size)
 
 Maximum `JSON.stringify(value).length`. Additional properties beyond the size
-limit are omitted.
+limit [are omitted](#big-output).
 
 ### Return value
 
@@ -91,12 +91,8 @@ _Type_: `any`
 Copy of the input `value` after applying all the [changes](#changes-1) to make
 it JSON-safe.
 
-The `value` is not serialized to a JSON string. This enables:
-
-- Choosing the serialization format (JSON, YAML, etc.) and library
-- Processing the value before serialization
-- Letting another module serialize, e.g. when using
-  [`process.send()`](https://nodejs.org/api/process.html#processsendmessage-sendhandle-options-callback)
+The `value` is not serialized to a JSON string. This allows processing it, or
+choosing the serialization format (JSON, YAML, etc.).
 
 #### changes
 
