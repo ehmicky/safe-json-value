@@ -91,8 +91,8 @@ _Type_: `any`
 Copy of the input `value` after applying all the [changes](#changes-1) to make
 it JSON-safe.
 
-The `value` is not serialized to a JSON string. This allows processing it, or
-choosing the serialization format (JSON, YAML, etc.).
+The `value` is not serialized to a JSON string. This allows choosing the
+serialization format (JSON, YAML, etc.), processing the value, etc.
 
 #### changes
 
@@ -103,7 +103,7 @@ individual change to a specific property. A given property might have multiple
 changes, listed in order.
 
 The top-level `value` itself might be changed (including to `undefined`) if it
-is invalid.
+is either invalid JSON or has a [`toJSON()` method](#tojson).
 
 ##### changes[*].path
 
