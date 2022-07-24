@@ -48,9 +48,9 @@ _Return value_: [`object`](#return-value)
 
 Makes `value` [JSON-safe](#changes-1) by:
 
-- Omitting properties which would [throw](#exceptions) or
+- Omitting properties which would either [throw](#exceptions) or
   [change type](#unexpected-types) unexpectedly with `JSON.stringify()`
-- Resolving properties which would [change values](#unresolved-values) with
+- Resolving properties which would [change value](#unresolved-values) with
   `JSON.stringify()`
 
 This never throws.
@@ -62,12 +62,10 @@ Object with the following properties.
 #### maxSize
 
 _Type_: `number`\
-_Default_: `Number.POSITIVE_INFINITY`
+_Default_: `Number.POSITIVE_INFINITY` (no maximum size)
 
 Maximum `JSON.stringify(value).length`. Additional properties beyond the size
 limit are omitted.
-
-Disabled when `Number.POSITIVE_INFINITY`.
 
 ### Return value
 
@@ -77,14 +75,16 @@ Object with the following properties.
 
 _Type_: `any`
 
-Copy of input `value` with [changes](#changes-1) applied to make it JSON-safe.
+Copy of the input `value` after applying all the [changes](#changes-1) to make
+it JSON-safe.
 
 #### changes
 
 _Type_: `Change[]`
 
 List of [changes](#changes-1) applied to [`value`](#value). Each item is an
-individual change to a specific property.
+individual change to a specific property. A given property might have multiple
+changes, listed in order.
 
 ##### changes[*].path
 
@@ -92,8 +92,9 @@ _Type_: `Array<string | symbol | number>`
 
 Property path.
 
-It can be manipulated or stringified using
-[`wild-wild-parser`](https://github.com/ehmicky/wild-wild-parser/#serializepathpatharray).
+It can be manipulated or
+[stringified](https://github.com/ehmicky/wild-wild-parser/#serializepathpatharray)
+using [`wild-wild-parser`](https://github.com/ehmicky/wild-wild-parser).
 
 ##### changes[*].oldValue
 
@@ -105,7 +106,7 @@ Property value before the change.
 
 _Type_: `any`
 
-Property value after the change. `undefined` if the property was omitted.
+Property value after the change. `undefined` means the property was omitted.
 
 ##### changes[*].reason
 
@@ -170,7 +171,7 @@ const input = {
     return { one: true }
   },
 }
-JSON.stringify(input) // '{"one":true}"
+JSON.parse(JSON.stringify(input)) // { one: true }
 safeJsonValue(input).value // { one: true }
 ```
 

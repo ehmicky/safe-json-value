@@ -4,7 +4,7 @@
 export interface Options {
   /**
    *
-   * @default Number.POSITIVE_INFINITY
+   * @default Number.POSITIVE_INFINITY (no maximum size)
    *
    * @example
    * ```js
