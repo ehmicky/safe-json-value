@@ -13,7 +13,9 @@ export interface Options {
   maxSize?: number
 }
 
-// Make an object/array deeply optional.
+/**
+ * Make an object/array deeply optional.
+ */
 type PartialDeep<T> = T extends Array<infer ArrayItem>
   ? Array<PartialDeep<ArrayItem>>
   : T extends object
