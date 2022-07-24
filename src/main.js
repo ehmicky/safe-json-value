@@ -27,11 +27,15 @@ export default function safeJsonValue(
 //     - Delaying the serialization
 //        - e.g. when `process.send()` is used with Node.js
 const transformValue = function ({ value, changes, ancestors, path }) {
-  const valueA = callToJSON(value, changes, path)
-  const valueB = filterValue(valueA, changes, path)
-  addNotArrayIndexChanges(valueB, changes, path)
-  const valueC = recurseValue({ value: valueB, changes, ancestors, path })
-  return valueC
+  try {
+    const valueA = callToJSON(value, changes, path)
+    const valueB = filterValue(valueA, changes, path)
+    addNotArrayIndexChanges(valueB, changes, path)
+    const valueC = recurseValue({ value: valueB, changes, ancestors, path })
+    return valueC
+  } catch (error) {
+    handleUncaughtException({ value, changes, path, error })
+  }
 }
 
 // Replace `object.toJSON()` by its return value.
@@ -395,3 +399,25 @@ const filterKey = function ({ parent, key, prop, changes, path }) {
 }
 
 const { propertyIsEnumerable: isEnum } = Object.prototype
+
+// When dynamic functions (`object.toJSON()`, `get` method or Proxy hook):
+//  - Returns new objects (as opposed to reference to existing objects)
+//  - That contains properties with dynamic functions themselves
+// It is not possible to detect whether the recursion will be infinite or not,
+// except by catching any exception due to a stack overflow.
+// One downside is that it also catches any bug in this library.
+//  - However the guarantee that this library never throws is more important.
+// Note: there is still one edge case which might crash the process (with
+// a memory heap crash):
+//  - When a `get` method or Proxy hook (not `object.toJSON()`)
+//  - Calls this library itself
+//  - Passing a reference (not a copy) to itself or to an ancestor
+const handleUncaughtException = function ({ value, changes, path, error }) {
+  changes.push({
+    path,
+    oldValue: value,
+    newValue: undefined,
+    reason: 'uncaughtException',
+    error,
+  })
+}
