@@ -13,6 +13,11 @@ export default function safeJsonValue(
   { maxSize = Number.POSITIVE_INFINITY } = {},
 ) {
   const changes = []
+
+  if (isToJSONRecursion(value)) {
+    return { value, changes }
+  }
+
   const ancestors = new Set([])
   const valueA = transformValue({ value, changes, ancestors, path: [] })
   return { value: valueA, changes }
@@ -47,7 +52,7 @@ const callToJSON = function (value, changes, path) {
   }
 
   try {
-    const toJSONResult = value.toJSON()
+    const toJSONResult = triggerToJSON(value)
     changes.push({
       path,
       oldValue: value,
@@ -71,6 +76,31 @@ const hasToJSON = function (value) {
     isObject(value) && 'toJSON' in value && typeof value.toJSON === 'function'
   )
 }
+
+// We handle the common use case of an `object.toJSON()` calling this library
+// itself.
+//  - We do so by adding a symbol property which is detected when the library
+//    starts, to prevent infinite recursion
+//  - This only works if `this` is passed as argument to this library (inside
+//    `object.toJSON()`) without any operation which would remove that symbol
+const triggerToJSON = function (value) {
+  // eslint-disable-next-line fp/no-mutation, no-param-reassign
+  value[TO_JSON_RECURSION] = true
+
+  try {
+    return value.toJSON()
+  } finally {
+    // eslint-disable-next-line fp/no-delete, no-param-reassign
+    delete value[TO_JSON_RECURSION]
+  }
+}
+
+const isToJSONRecursion = function (value) {
+  return isObject(value) && value[TO_JSON_RECURSION]
+}
+
+// Enumerable so that object spreads keep it
+const TO_JSON_RECURSION = Symbol('toJsonRecursion')
 
 // Omit types that are not supported by `JSON.stringify()`:
 //  - bigints would throw
