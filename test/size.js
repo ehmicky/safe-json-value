@@ -181,3 +181,20 @@ each(
     })
   },
 )
+
+test('Applies options.maxSize recursively', (t) => {
+  const input = { one: { two: { three: true, four: true } } }
+  const output = { one: { two: { three: true } } }
+  const maxSize = JSON.stringify(output).length
+  t.deepEqual(safeJsonValue(input, { maxSize }), {
+    value: output,
+    changes: [
+      {
+        path: ['one', 'two', 'four'],
+        oldValue: true,
+        newValue: undefined,
+        reason: 'maxSize',
+      },
+    ],
+  })
+})
