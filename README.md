@@ -91,6 +91,9 @@ _Type_: `any`
 Copy of the input `value` after applying all the [changes](#changes-1) to make
 it JSON-safe.
 
+The top-level `value` itself might be changed (including to `undefined`) if it
+is either invalid JSON or has a [`toJSON()` method](#tojson).
+
 The `value` is not serialized to a JSON string. This allows choosing the
 serialization format (JSON, YAML, etc.), processing the value, etc.
 
@@ -101,9 +104,6 @@ _Type_: `Change[]`
 List of [changes](#changes-1) applied to [`value`](#value). Each item is an
 individual change to a specific property. A given property might have multiple
 changes, listed in order.
-
-The top-level `value` itself might be changed (including to `undefined`) if it
-is either invalid JSON or has a [`toJSON()` method](#tojson).
 
 ##### changes[*].path
 
@@ -147,8 +147,10 @@ Reason for the change among: [`"bigint"`](#bigint), [`"class"`](#classes),
 
 _Type_: `error?`
 
-Error that triggered the change. Only if [`reason`](#changesreason) is one of:
-`"uncaughtException"`.
+Error that triggered the change. Only if [`reason`](#changesreason) is
+[`"uncaughtException"`](#infinite-recursion),
+[`"unsafeGetter"`](#exceptions-in-getters) or
+[`"unsafeToJSON"`](#exceptions-in-tojson).
 
 # Changes
 
