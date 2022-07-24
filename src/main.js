@@ -31,7 +31,7 @@ const transformValue = function ({ value, changes, ancestors, path }) {
     const valueA = callToJSON(value, changes, path)
     const valueB = filterValue(valueA, changes, path)
     addNotArrayIndexChanges(valueB, changes, path)
-    const valueC = recurseValue({ value: valueB, changes, ancestors, path })
+    const valueC = safeRecurseValue({ value: valueB, changes, ancestors, path })
     return valueC
   } catch (error) {
     handleUncaughtException({ value, changes, path, error })
@@ -182,7 +182,7 @@ const safeGetArrayProp = function (array, key) {
 //       `maxSize`
 //  - This is easier to implement
 // We omit cycles since `JSON.stringify()` throws on them.
-const recurseValue = function ({ value, changes, ancestors, path }) {
+const safeRecurseValue = function ({ value, changes, ancestors, path }) {
   if (!isObject(value)) {
     return value
   }
@@ -198,13 +198,15 @@ const recurseValue = function ({ value, changes, ancestors, path }) {
   }
 
   ancestors.add(value)
-
-  const valueA = Array.isArray(value)
-    ? recurseArray({ array: value, changes, ancestors, path })
-    : recurseObject({ object: value, changes, ancestors, path })
-
+  const valueA = recurseValue({ value, changes, ancestors, path })
   ancestors.delete(value)
   return valueA
+}
+
+const recurseValue = function ({ value, changes, ancestors, path }) {
+  return Array.isArray(value)
+    ? recurseArray({ array: value, changes, ancestors, path })
+    : recurseObject({ object: value, changes, ancestors, path })
 }
 
 const isObject = function (value) {
