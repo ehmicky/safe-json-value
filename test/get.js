@@ -5,31 +5,47 @@ import { each } from 'test-each'
 each(
   [
     {
-      // eslint-disable-next-line fp/no-get-set
-      get prop() {
-        return true
+      input: {
+        // eslint-disable-next-line fp/no-get-set
+        get prop() {
+          return true
+        },
       },
     },
     {
-      // eslint-disable-next-line fp/no-get-set
-      get prop() {
-        return true
+      input: {
+        // eslint-disable-next-line fp/no-get-set
+        get prop() {
+          return true
+        },
+        // eslint-disable-next-line fp/no-get-set
+        set prop(_) {},
       },
-      // eslint-disable-next-line fp/no-get-set
-      set prop(_) {},
+    },
+    {
+      input: {
+        // eslint-disable-next-line fp/no-get-set
+        get prop() {
+          // eslint-disable-next-line fp/no-this, fp/no-mutating-methods
+          Object.defineProperty(this, 'prop', {
+            value: true,
+            enumerable: true,
+            writable: true,
+            configurable: true,
+          })
+          return true
+        },
+      },
+      title: 'selfModifyingProp',
     },
   ],
-  ({ title }, input) => {
+  ({ title }, { input }) => {
     test(`Resolve getters | ${title}`, (t) => {
+      const { get } = Object.getOwnPropertyDescriptor(input, 'prop')
       t.deepEqual(safeJsonValue(input), {
         value: { prop: true },
         changes: [
-          {
-            path: ['prop'],
-            oldValue: Object.getOwnPropertyDescriptor(input, 'prop').get,
-            newValue: true,
-            reason: 'getter',
-          },
+          { path: ['prop'], oldValue: get, newValue: true, reason: 'getter' },
         ],
       })
     })
