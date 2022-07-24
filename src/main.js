@@ -298,48 +298,69 @@ const recurseArray = function ({
   maxSize,
 }) {
   const newArray = []
-  let emptyArray = true
-  let sizeA = size
+  // eslint-disable-next-line fp/no-let
+  let state = { emptyArray: true, size }
 
   // eslint-disable-next-line fp/no-loops, fp/no-mutation, fp/no-let
   for (let index = 0; index < array.length; index += 1) {
-    const itemPath = [...path, index]
-    const { size: sizeB, stop } = addSize({
-      type: 'arrayItem',
-      size: sizeA,
+    // eslint-disable-next-line fp/no-mutation
+    state = recurseArrayItem({
+      path,
+      index,
       maxSize,
       changes,
-      path: itemPath,
-      context: { emptyArray, array, index },
-    })
-
-    if (stop) {
-      break
-    }
-
-    const { value: item, size: sizeC } = transformProp({
-      parent: array,
-      key: index,
-      changes,
+      array,
       ancestors,
-      path: itemPath,
-      size: sizeB,
-      maxSize,
+      newArray,
+      state,
     })
-
-    // eslint-disable-next-line max-depth
-    if (item !== undefined) {
-      if (emptyArray) {
-        emptyArray = false
-      }
-
-      sizeA = sizeC
-      // eslint-disable-next-line fp/no-mutating-methods
-      newArray.push(item)
-    }
   }
 
-  return { value: newArray, size: sizeA }
+  return { value: newArray, size: state.size }
+}
+
+const recurseArrayItem = function ({
+  path,
+  index,
+  maxSize,
+  changes,
+  array,
+  ancestors,
+  newArray,
+  state,
+  state: { emptyArray, size },
+}) {
+  const itemPath = [...path, index]
+  const { size: sizeA, stop } = addSize({
+    type: 'arrayItem',
+    size,
+    maxSize,
+    changes,
+    path: itemPath,
+    context: { emptyArray, array, index },
+  })
+
+  if (stop) {
+    return state
+  }
+
+  const { value, size: sizeB } = transformProp({
+    parent: array,
+    key: index,
+    changes,
+    ancestors,
+    path: itemPath,
+    size: sizeA,
+    maxSize,
+  })
+
+  if (value === undefined) {
+    return state
+  }
+
+  // eslint-disable-next-line fp/no-mutating-methods
+  newArray.push(value)
+  return { emptyArray: false, size: sizeB }
 }
 
 // Recurse over object properties.
@@ -363,7 +384,7 @@ const recurseObject = function ({
   // eslint-disable-next-line fp/no-loops
   for (const key of Reflect.ownKeys(object)) {
     // eslint-disable-next-line fp/no-mutation
-    state = recurseProp({
+    state = recurseObjectProp({
       path,
       key,
       maxSize,
@@ -400,7 +421,7 @@ const addClassChange = function ({ object, newObject, changes, path }) {
   }
 }
 
-const recurseProp = function ({
+const recurseObjectProp = function ({
   path,
   key,
   maxSize,
