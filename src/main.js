@@ -12,15 +12,10 @@ export default function safeJsonValue(
 }
 
 const transformProp = function ({ parent, key, changes, path }) {
-  // eslint-disable-next-line fp/no-mutating-methods
-  path.push(key)
-
-  const prop = safeGetProp({ parent, key, changes, path })
-  const propA = filterKey({ parent, key, prop, changes, path })
-  const propB = transformValue(propA, changes, path)
-
-  // eslint-disable-next-line fp/no-mutating-methods
-  path.pop()
+  const pathA = [...path, key]
+  const prop = safeGetProp({ parent, key, changes, path: pathA })
+  const propA = filterKey({ parent, key, prop, changes, path: pathA })
+  const propB = transformValue(propA, changes, pathA)
   return propB
 }
 
@@ -30,7 +25,7 @@ const safeGetProp = function ({ parent, key, changes, path }) {
   } catch (error) {
     // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
-      path: [...path],
+      path,
       oldValue: undefined,
       newValue: undefined,
       reason: 'unsafeGetter',
@@ -57,12 +52,7 @@ const addGetterChange = function ({
 }) {
   if (get !== undefined || set !== undefined) {
     // eslint-disable-next-line fp/no-mutating-methods
-    changes.push({
-      path: [...path],
-      oldValue: prop,
-      newValue: prop,
-      reason: 'getter',
-    })
+    changes.push({ path, oldValue: prop, newValue: prop, reason: 'getter' })
   }
 }
 
@@ -75,7 +65,7 @@ const addDescriptorChange = function ({
   if (writable === false) {
     // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
-      path: [...path],
+      path,
       oldValue: prop,
       newValue: prop,
       reason: 'notWritable',
@@ -85,7 +75,7 @@ const addDescriptorChange = function ({
   if (configurable === false) {
     // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
-      path: [...path],
+      path,
       oldValue: prop,
       newValue: prop,
       reason: 'notConfigurable',
@@ -97,7 +87,7 @@ const filterKey = function ({ parent, key, prop, changes, path }) {
   if (typeof key === 'symbol') {
     // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
-      path: [...path],
+      path,
       oldValue: prop,
       newValue: undefined,
       reason: 'symbolKey',
@@ -108,7 +98,7 @@ const filterKey = function ({ parent, key, prop, changes, path }) {
   if (!isEnum.call(parent, key) && !Array.isArray(parent)) {
     // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
-      path: [...path],
+      path,
       oldValue: prop,
       newValue: undefined,
       reason: 'notEnumerable',
@@ -136,7 +126,7 @@ const callToJSON = function (value, changes, path) {
     const toJSONResult = value.toJSON()
     // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
-      path: [...path],
+      path,
       oldValue: value,
       newValue: toJSONResult,
       reason: 'toJSON',
@@ -145,7 +135,7 @@ const callToJSON = function (value, changes, path) {
   } catch (error) {
     // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
-      path: [...path],
+      path,
       oldValue: value,
       newValue: undefined,
       reason: 'unsafeToJSON',
@@ -167,7 +157,7 @@ const filterValue = function (value, changes, path) {
 
   // eslint-disable-next-line fp/no-mutating-methods
   changes.push({
-    path: [...path],
+    path,
     oldValue: value,
     newValue: undefined,
     reason: 'invalidType',
@@ -270,7 +260,7 @@ const addClassChange = function ({ object, newObject, changes, path }) {
   if (!isPlainObj(object)) {
     // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
-      path: [...path],
+      path,
       oldValue: object,
       newValue: newObject,
       reason: 'class',
