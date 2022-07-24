@@ -7,6 +7,8 @@ import { isObject } from './is_object.js'
 //  - Only on `object`, not deeply.
 //  - This mimics `JSON.stringify()` behavior.
 // If `object.toJSON()` throws, `object` is omitted.
+//  - As opposed to just ignoring `toJSON()` because this would mean it could
+//    have different types/shapes depending on whether `toJSON()` throws
 export const callToJSON = function (value, changes, path) {
   if (!hasToJSON(value)) {
     return value

@@ -78,6 +78,13 @@ _Type_: `any`
 Copy of the input `value` after applying all the [changes](#changes-1) to make
 it JSON-safe.
 
+The `value` is not serialized to a JSON string. This enables:
+
+- Choosing the serialization format (JSON, YAML, etc.) and library
+- Processing the value before serialization
+- Letting another module serialize, e.g. when using
+  [`process.send()`](https://nodejs.org/api/process.html#processsendmessage-sendhandle-options-callback)
+
 #### changes
 
 _Type_: `Change[]`
@@ -85,6 +92,9 @@ _Type_: `Change[]`
 List of [changes](#changes-1) applied to [`value`](#value). Each item is an
 individual change to a specific property. A given property might have multiple
 changes, listed in order.
+
+The top-level `value` itself might be changed (including to `undefined`) if it
+is invalid.
 
 ##### changes[*].path
 
@@ -115,12 +125,23 @@ _Type_: `string`
 Reason for the change among:
 
 - [`"bigint"`](#bigint)
+- [`"class"`](#classes)
 - [`"cycle"`](#cycles)
 - [`"function"`](#functions)
+- [`"getter"`](#getters)
 - [`"infiniteNumber"`](#nan-and-infinity)
+- [`"maxSize"`](#big-output)
+- [`"notArrayIndex"`](#array-properties)
+- [`"notEnumerable"`](#non-enumerable-keys)
+- [`"notConfigurable"`](#non-configurable-properties)
+- [`"notWritable"`](#non-writable-properties)
+- [`"symbolKey"`](#symbol-keys)
 - [`"symbolValue"`](#symbol-values)
+- [`"toJSON"`](#tojson)
 - [`"uncaughtException"`](#infinite-recursion)
 - [`"undefined"`](#undefined)
+- [`"unsafeGetter"`](#exceptions-in-getters)
+- [`"unsafeToJSON"`](#exceptions-in-tojson)
 
 ##### changes[*].error
 
@@ -164,6 +185,87 @@ JSON.stringify(input) // Throws due to BigInt
 JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
 ```
 
+### Exceptions in `toJSON()`
+
+```js
+const input = {
+  one: true,
+  two: {
+    toJSON() {
+      throw new Error('example')
+    },
+  },
+}
+JSON.stringify(input) // Throws due to `toJSON()`
+JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
+```
+
+### Exceptions in getters
+
+<!-- eslint-disable fp/no-get-set -->
+
+```js
+const input = {
+  one: true,
+  get two() {
+    throw new Error('example')
+  },
+}
+JSON.stringify(input) // Throws due to `get two()`
+JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
+```
+
+### Exceptions in proxies
+
+<!-- eslint-disable fp/no-proxy -->
+
+```js
+const input = new Proxy(
+  { one: false },
+  {
+    get() {
+      throw new Error('example')
+    },
+  },
+)
+JSON.stringify(input) // Throws due to proxy
+JSON.stringify(safeJsonValue(input).value) // '{}'
+```
+
+### Non-writable properties
+
+<!-- eslint-disable fp/no-mutating-methods, fp/no-mutation -->
+
+```js
+const input = {}
+Object.defineProperty(input, 'one', {
+  value: true,
+  enumerable: true,
+  writable: false,
+  configurable: true,
+})
+input.one = false // Throws: non-writable
+const safeInput = safeJsonValue(input).value
+safeInput.one = false // Does not throw
+```
+
+### Non-configurable properties
+
+<!-- eslint-disable fp/no-mutating-methods, fp/no-mutation -->
+
+```js
+const input = {}
+Object.defineProperty(input, 'one', {
+  value: true,
+  enumerable: true,
+  writable: true,
+  configurable: false,
+})
+Object.defineProperty(input, 'one', { value: false, enumerable: false }) // Throws: non-configurable
+const safeInput = safeJsonValue(input).value
+Object.defineProperty(safeInput, 'one', { value: false, enumerable: false }) // Does not throw
+```
+
 ## Unexpected types
 
 `JSON.stringify()` changes the types of specific values unexpectedly. Those are
@@ -175,6 +277,16 @@ omitted.
 const input = { one: true, two: Number.NaN, three: Number.POSITIVE_INFINITY }
 JSON.stringify(input) // '{"one":true,"two":null,"three":null}"
 JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
+```
+
+### Invalid array items
+
+<!-- eslint-disable symbol-description -->
+
+```js
+const input = [true, undefined, Symbol(), false]
+JSON.stringify(input) // '[true, null, null, false]'
+JSON.stringify(safeJsonValue(input).value) // '[true, false]'
 ```
 
 ## Filtered values
@@ -222,6 +334,28 @@ JSON.parse(JSON.stringify(input)) // { one: true }
 safeJsonValue(input).value // { one: true }
 ```
 
+### Non-enumerable keys
+
+<!-- eslint-disable no-unused-expressions, fp/no-mutating-methods -->
+
+```js
+const input = { one: true }
+Object.defineProperty(input, 'two', { value: true, enumerable: false })
+JSON.parse(JSON.stringify(input)) // { one: true }
+safeJsonValue(input).value // { one: true }
+```
+
+### Array properties
+
+<!-- eslint-disable no-unused-expressions, fp/no-mutation -->
+
+```js
+const input = [true]
+input.prop = true
+JSON.parse(JSON.stringify(input)) // [true]
+safeJsonValue(input).value // [true]
+```
+
 ## Unresolved values
 
 `JSON.stringify()` can transform some values. Those are resolved right away to
@@ -241,11 +375,63 @@ JSON.parse(JSON.stringify(input)) // { one: true }
 safeJsonValue(input).value // { one: true }
 ```
 
+### Dates
+
+<!-- eslint-disable no-unused-expressions -->
+
+```js
+const input = { one: new Date() }
+JSON.parse(JSON.stringify(input)) // { one: '2022-07-29T14:37:40.865Z' }
+safeJsonValue(input).value // { one: '2022-07-29T14:37:40.865Z' }
+```
+
+### Classes
+
+<!-- eslint-disable no-unused-expressions -->
+
+```js
+const input = { one: new Set([]) }
+JSON.parse(JSON.stringify(input)) // { one: {} }
+safeJsonValue(input).value // { one: {} }
+```
+
+### Getters
+
+<!-- eslint-disable no-unused-expressions, fp/no-get-set -->
+
+```js
+const input = {
+  get one() {
+    return true
+  },
+}
+JSON.parse(JSON.stringify(input)) // { one: true }
+safeJsonValue(input).value // { one: true }
+```
+
+### Proxies
+
+<!-- eslint-disable no-unused-expressions, fp/no-proxy -->
+
+```js
+const input = new Proxy(
+  { one: false },
+  {
+    get() {
+      return true
+    },
+  },
+)
+JSON.parse(JSON.stringify(input)) // { one: true }
+safeJsonValue(input).value // { one: true }
+```
+
 ## Big output
 
 Big JSON strings can make a process, filesystem operation or network request
 crash. When using the [`maxSize` option](#maxsize), properties that are too
-large are omitted.
+large are omitted. Large values (including strings) are completely removed, not
+truncated.
 
 ```js
 const input = { one: true, two: 'a'.repeat(1e6) }

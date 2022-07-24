@@ -30,12 +30,7 @@ export default function safeJsonValue(
 
 // The final top-level return value:
 //  - Might be `undefined`
-//  - Is not serialized to a string, as this allows:
-//     - Choosing the serialization format and library
-//        - e.g. normal JSON, canonical JSON, YAML, etc.
-//     - Further processing on the value before serialization
-//     - Delaying the serialization
-//        - e.g. when `process.send()` is used with Node.js
+//  - Is not serialized to a string
 const transformValue = function ({
   value,
   changes,
