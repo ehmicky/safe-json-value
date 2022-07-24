@@ -24,8 +24,20 @@ import safeJsonValue from 'safe-json-value'
 
 const input = { one: true }
 input.self = input
+
 JSON.stringify(input) // Throws due to cycle
-JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
+const { value, changes } = safeJsonValue(input)
+JSON.stringify(value) // '{"one":true}"
+
+console.log(changes) // List of changed properties
+// [
+//   {
+//     path: ['self'],
+//     oldValue: <ref *1> { one: true, self: [Circular *1] },
+//     newValue: undefined,
+//     reason: 'cycle'
+//   }
+// ]
 ```
 
 # Install
