@@ -122,26 +122,17 @@ Property value after the change. `undefined` means the property was omitted.
 
 _Type_: `string`
 
-Reason for the change among:
-
-- [`"bigint"`](#bigint)
-- [`"class"`](#classes)
-- [`"cycle"`](#cycles)
-- [`"function"`](#functions)
-- [`"getter"`](#getters)
-- [`"infiniteNumber"`](#nan-and-infinity)
-- [`"maxSize"`](#big-output)
-- [`"notArrayIndex"`](#array-properties)
-- [`"notEnumerable"`](#non-enumerable-keys)
-- [`"notConfigurable"`](#non-configurable-properties)
-- [`"notWritable"`](#non-writable-properties)
-- [`"symbolKey"`](#symbol-keys)
-- [`"symbolValue"`](#symbol-values)
-- [`"toJSON"`](#tojson)
-- [`"uncaughtException"`](#infinite-recursion)
-- [`"undefined"`](#undefined)
-- [`"unsafeGetter"`](#exceptions-in-getters)
-- [`"unsafeToJSON"`](#exceptions-in-tojson)
+Reason for the change among: [`"bigint"`](#bigint), [`"class"`](#classes),
+[`"cycle"`](#cycles), [`"function"`](#functions), [`"getter"`](#getters),
+[`"infiniteNumber"`](#nan-and-infinity), [`"maxSize"`](#big-output),
+[`"notArrayIndex"`](#array-properties),
+[`"notEnumerable"`](#non-enumerable-keys),
+[`"notConfigurable"`](#non-configurable-properties),
+[`"notWritable"`](#non-writable-properties), [`"symbolKey"`](#symbol-keys),
+[`"symbolValue"`](#symbol-values), [`"toJSON"`](#tojson),
+[`"uncaughtException"`](#infinite-recursion), [`"undefined"`](#undefined),
+[`"unsafeGetter"`](#exceptions-in-getters) or
+[`"unsafeToJSON"`](#exceptions-in-tojson).
 
 ##### changes[*].error
 
