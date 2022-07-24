@@ -305,7 +305,7 @@ const recurseArray = function ({
 
   // eslint-disable-next-line fp/no-loops, fp/no-mutation, fp/no-let
   for (let index = 0; index < array.length; index += 1) {
-    const returnValue = recurseArrayItem({
+    const returnValue = recurseProp({
       parent: array,
       changes,
       ancestors,
@@ -354,7 +354,7 @@ const recurseObject = function ({
 
   // eslint-disable-next-line fp/no-loops
   for (const key of Reflect.ownKeys(object)) {
-    const returnValue = recurseObjectProp({
+    const returnValue = recurseProp({
       parent: object,
       changes,
       ancestors,
@@ -404,7 +404,7 @@ const addClassChange = function ({ object, newObject, changes, path }) {
   }
 }
 
-const recurseArrayItem = function ({
+const recurseProp = function ({
   parent,
   changes,
   ancestors,
@@ -414,48 +414,6 @@ const recurseArrayItem = function ({
   type,
   size,
   empty,
-}) {
-  const propPath = [...path, key]
-  const { size: sizeA, stop } = addSize({
-    type,
-    size,
-    maxSize,
-    changes,
-    path: propPath,
-    context: { empty, parent, key },
-  })
-
-  if (stop) {
-    return
-  }
-
-  const { value, size: sizeB } = transformProp({
-    parent,
-    key,
-    changes,
-    ancestors,
-    path: propPath,
-    size: sizeA,
-    maxSize,
-  })
-
-  if (value === undefined) {
-    return
-  }
-
-  return { empty: false, size: sizeB, value }
-}
-
-const recurseObjectProp = function ({
-  parent,
-  changes,
-  ancestors,
-  path,
-  maxSize,
-  key,
-  type,
-  empty,
-  size,
 }) {
   const propPath = [...path, key]
   const { size: sizeA, stop } = addSize({
