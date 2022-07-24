@@ -1,10 +1,11 @@
+/* eslint-disable max-lines */
 export default function safeJsonValue(
   value,
   // eslint-disable-next-line no-unused-vars
   { maxSize = Number.POSITIVE_INFINITY } = {},
 ) {
   const changes = []
-  const valueA = recurseValue(value, changes, [])
+  const valueA = transformValue(value, changes, [])
   return { value: valueA, changes }
 }
 
@@ -14,7 +15,7 @@ const transformProp = function (parent, key, changes, path) {
   path.push(key)
 
   const prop = safeGetProp(parent, key, changes, path)
-  const propA = recurseValue(prop, changes, path)
+  const propA = transformValue(prop, changes, path)
 
   // eslint-disable-next-line fp/no-mutating-methods
   path.pop()
@@ -79,14 +80,56 @@ const addDescriptorChange = function (
   }
 }
 
+const transformValue = function (value, changes, path) {
+  const valueA = callToJSON(value, changes, path)
+  return recurseValue(valueA, changes, path)
+}
+
+const callToJSON = function (value, changes, path) {
+  if (!hasToJSON(value)) {
+    return value
+  }
+
+  try {
+    const valueA = value.toJSON()
+    // eslint-disable-next-line fp/no-mutating-methods
+    changes.push({
+      path: [...path],
+      oldValue: value,
+      newValue: valueA,
+      reason: 'toJSON',
+    })
+    return valueA
+  } catch (error) {
+    // eslint-disable-next-line fp/no-mutating-methods
+    changes.push({
+      path: [...path],
+      oldValue: value,
+      newValue: undefined,
+      reason: 'exception',
+      error,
+    })
+  }
+}
+
+const hasToJSON = function (value) {
+  return (
+    isObject(value) && 'toJSON' in value && typeof value.toJSON === 'function'
+  )
+}
+
 const recurseValue = function (value, changes, path) {
-  if (typeof value !== 'object' || value === null) {
+  if (!isObject(value)) {
     return value
   }
 
   return Array.isArray(value)
     ? recurseArray(value, changes, path)
     : recurseObject(value, changes, path)
+}
+
+const isObject = function (value) {
+  return typeof value === 'object' && value !== null
 }
 
 const recurseArray = function (array, changes, path) {
