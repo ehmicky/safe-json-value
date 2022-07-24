@@ -161,7 +161,7 @@ const addNotArrayIndexChanges = function (array, changes, path) {
     if (!arrayProps.has(key)) {
       changes.push({
         path: [...path, key],
-        oldValue: safeGetChangeProp(array, key),
+        oldValue: safeGetChangeProp({ parent: array, key }),
         newValue: undefined,
         reason: 'notArrayIndex',
       })
@@ -183,9 +183,9 @@ const getArrayIndex = function (_, index) {
 }
 
 // If the object|array property is a getter or Proxy hook, it might throw.
-const safeGetChangeProp = function (objectOrArray, key) {
+const safeGetChangeProp = function ({ parent, key }) {
   try {
-    return objectOrArray[key]
+    return parent[key]
   } catch {}
 }
 
@@ -686,9 +686,7 @@ const SIZED_TYPES = {
     getSize({ empty }) {
       return empty ? 0 : 1
     },
-    getOldValue({ parent, key }) {
-      return safeGetChangeProp(parent, key)
-    },
+    getOldValue: safeGetChangeProp,
   },
   objectProp: {
     getSize({ key, empty }) {
@@ -696,8 +694,6 @@ const SIZED_TYPES = {
         ? 0
         : JSON.stringify(key).length + (empty ? 1 : 2)
     },
-    getOldValue({ parent, key }) {
-      return safeGetChangeProp(parent, key)
-    },
+    getOldValue: safeGetChangeProp,
   },
 }
