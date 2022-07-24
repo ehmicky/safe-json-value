@@ -13,35 +13,6 @@ each(
 
 each(
   [
-    { input: { prop: true }, output: { prop: true }, maxSize: 13, changes: [] },
-    {
-      input: { prop: true },
-      output: {},
-      maxSize: 12,
-      changes: [
-        {
-          path: ['prop'],
-          oldValue: true,
-          newValue: undefined,
-          reason: 'maxSize',
-        },
-      ],
-    },
-  ],
-  ({ title }, { input, output, maxSize, changes: expectedChanges }) => {
-    test(`Applies options.maxSize | ${title}`, (t) => {
-      const { value, changes } = safeJsonValue(input, { maxSize })
-      t.deepEqual(
-        { value, changes },
-        { value: output, changes: expectedChanges },
-      )
-      t.true(maxSize >= JSON.stringify(value).length)
-    })
-  },
-)
-
-each(
-  [
     {},
     [],
     true,
@@ -67,7 +38,7 @@ each(
     '\uDEAD',
   ],
   ({ title }, input) => {
-    test(`Computes size correctly | ${title}`, (t) => {
+    test(`Applies options.maxSize on values | ${title}`, (t) => {
       const size = JSON.stringify(input).length
       t.deepEqual(safeJsonValue(input, { maxSize: size }), {
         value: input,
@@ -82,3 +53,25 @@ each(
     })
   },
 )
+
+each(['prop'], ({ title }, key) => {
+  test(`Applies options.maxSize on properties | ${title}`, (t) => {
+    const input = { one: true, [key]: true }
+    const size = JSON.stringify(input).length
+    t.deepEqual(safeJsonValue(input, { maxSize: size }), {
+      value: input,
+      changes: [],
+    })
+    t.deepEqual(safeJsonValue(input, { maxSize: size - 1 }), {
+      value: { one: true },
+      changes: [
+        {
+          path: ['prop'],
+          oldValue: true,
+          newValue: undefined,
+          reason: 'maxSize',
+        },
+      ],
+    })
+  })
+})
