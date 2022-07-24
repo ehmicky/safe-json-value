@@ -1,4 +1,6 @@
 /* eslint-disable max-lines */
+import isPlainObj from 'is-plain-obj'
+
 export default function safeJsonValue(
   value,
   // eslint-disable-next-line no-unused-vars
@@ -82,7 +84,8 @@ const addDescriptorChange = function (
 
 const transformValue = function (value, changes, path) {
   const valueA = callToJSON(value, changes, path)
-  return recurseValue(valueA, changes, path)
+  const valueB = filterValue(valueA, changes, path)
+  return recurseValue(valueB, changes, path)
 }
 
 const callToJSON = function (value, changes, path) {
@@ -118,6 +121,30 @@ const hasToJSON = function (value) {
   )
 }
 
+const filterValue = function (value, changes, path) {
+  if (!shouldFilter(value)) {
+    return value
+  }
+
+  // eslint-disable-next-line fp/no-mutating-methods
+  changes.push({
+    path: [...path],
+    oldValue: value,
+    newValue: undefined,
+    reason: 'invalidType',
+  })
+}
+
+const shouldFilter = function (value) {
+  const typeofValue = typeof value
+  return (
+    FILTERED_TYPES.has(typeofValue) ||
+    (typeofValue === 'number' && !Number.isFinite(value))
+  )
+}
+
+const FILTERED_TYPES = new Set(['function', 'symbol', 'undefined', 'bigint'])
+
 const recurseValue = function (value, changes, path) {
   if (!isObject(value)) {
     return value
@@ -150,7 +177,8 @@ const recurseArray = function (array, changes, path) {
 }
 
 const recurseObject = function (object, changes, path) {
-  const objectA = {}
+  const objectA =
+    Object.getPrototypeOf(object) === null ? Object.create(null) : {}
 
   // eslint-disable-next-line fp/no-loops
   for (const key of Object.keys(object)) {
@@ -163,5 +191,19 @@ const recurseObject = function (object, changes, path) {
     }
   }
 
+  addClassChange(object, objectA, changes, path)
   return objectA
+}
+
+// eslint-disable-next-line max-params
+const addClassChange = function (object, objectA, changes, path) {
+  if (!isPlainObj(object)) {
+    // eslint-disable-next-line fp/no-mutating-methods
+    changes.push({
+      path: [...path],
+      oldValue: object,
+      newValue: objectA,
+      reason: 'class',
+    })
+  }
 }
