@@ -37,7 +37,8 @@ const transformValue = function (value, changes, path) {
 //  - Including for native classes like `Date`
 // This ensures this is resolved right now instead of during `JSON.stringify()`.
 // If the return value has `toJSON()` itself, it is ignored.
-//  - This is to mimic `JSON.stringify()` behavior.
+//  - Only on `object`, not deeply.
+//  - This mimics `JSON.stringify()` behavior.
 // If `object.toJSON()` throws, `object` is omitted.
 const callToJSON = function (value, changes, path) {
   if (!hasToJSON(value)) {
