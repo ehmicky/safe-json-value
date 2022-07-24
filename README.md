@@ -145,9 +145,9 @@ Reason for the change among: [`"bigint"`](#bigint), [`"class"`](#classes),
 
 ##### changes[*].error
 
-_Type_: `error?`
+_Type_: `Error?`
 
-Error that triggered the change. Only if [`reason`](#changesreason) is
+Error that triggered the change. Only present if [`reason`](#changesreason) is
 [`"uncaughtException"`](#infinite-recursion),
 [`"unsafeGetter"`](#exceptions-in-getters) or
 [`"unsafeToJSON"`](#exceptions-in-tojson).
@@ -175,7 +175,7 @@ JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
 
 ```js
 const input = { toJSON: () => ({ one: true, input: { ...input } }) }
-JSON.stringify(input) // Throws due to infinite recursion
+JSON.stringify(input) // Throws due to infinite `toJSON()` recursion
 JSON.stringify(safeJsonValue(input).value) // '{"one":true,"input":{}}"
 ```
 
@@ -248,7 +248,7 @@ Object.defineProperty(input, 'one', {
 })
 input.one = false // Throws: non-writable
 const safeInput = safeJsonValue(input).value
-safeInput.one = false // Does not throw
+safeInput.one = false // Does not throw: now writable
 ```
 
 ### Non-configurable properties
@@ -263,9 +263,11 @@ Object.defineProperty(input, 'one', {
   writable: true,
   configurable: false,
 })
-Object.defineProperty(input, 'one', { value: false, enumerable: false }) // Throws: non-configurable
+// Throws: non-configurable
+Object.defineProperty(input, 'one', { value: false, enumerable: false })
 const safeInput = safeJsonValue(input).value
-Object.defineProperty(safeInput, 'one', { value: false, enumerable: false }) // Does not throw
+// Does not throw: now configurable
+Object.defineProperty(safeInput, 'one', { value: false, enumerable: false })
 ```
 
 ## Unexpected types
@@ -431,9 +433,10 @@ safeJsonValue(input).value // { one: true }
 ## Big output
 
 Big JSON strings can make a process, filesystem operation or network request
-crash. When using the [`maxSize` option](#maxsize), properties that are too
-large are omitted. Large values (including strings) are completely removed, not
-truncated.
+crash.
+
+When using the [`maxSize` option](#maxsize), properties that are too large are
+omitted. Large values (including strings) are completely removed, not truncated.
 
 ```js
 const input = { one: true, two: 'a'.repeat(1e6) }
