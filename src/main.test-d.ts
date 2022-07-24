@@ -9,7 +9,6 @@ import safeJsonValue, { Options, Change, Reason } from './main.js'
 
 const trueValue = true as const
 const arrayValue = [0 as const, trueValue]
-expectType<undefined>(safeJsonValue(undefined).value)
 expectType<true | undefined>(safeJsonValue(trueValue).value)
 expectType<never[] | undefined>(safeJsonValue([]).value)
 expectType<{} | undefined>(safeJsonValue({}).value)
@@ -18,6 +17,40 @@ expectType<{ a?: true } | undefined>(safeJsonValue({ a: trueValue }).value)
 expectType<{ a?: true }[] | undefined>(safeJsonValue([{ a: trueValue }]).value)
 expectType<{ a?: (0 | true)[] } | undefined>(
   safeJsonValue({ a: arrayValue }).value,
+)
+const arrayWithProps: boolean[] & { prop?: boolean } = [true]
+arrayWithProps.prop = true
+expectType<boolean[] | undefined>(safeJsonValue(arrayWithProps).value)
+expectType<{ a?: boolean[] } | undefined>(
+  safeJsonValue({ a: arrayWithProps }).value,
+)
+expectType<string | undefined>(safeJsonValue(new Date()).value)
+expectType<{ a?: string } | undefined>(safeJsonValue({ a: new Date() }).value)
+const objWithToJSON = {
+  toJSON(): true {
+    return true
+  },
+}
+expectType<true | undefined>(safeJsonValue(objWithToJSON).value)
+expectType<{ a?: true } | undefined>(safeJsonValue({ a: objWithToJSON }).value)
+expectType<{ a?: true } | undefined>(
+  safeJsonValue({ a: trueValue, [Symbol()]: trueValue }).value,
+)
+expectType<undefined>(safeJsonValue(undefined).value)
+expectType<{ a?: true } | undefined>(
+  safeJsonValue({ a: trueValue, b: undefined }).value,
+)
+expectType<undefined>(safeJsonValue(0n).value)
+expectType<{ a?: true } | undefined>(
+  safeJsonValue({ a: trueValue, b: 0n }).value,
+)
+expectType<undefined>(safeJsonValue(Symbol()).value)
+expectType<{ a?: true } | undefined>(
+  safeJsonValue({ a: trueValue, b: Symbol() }).value,
+)
+expectType<undefined>(safeJsonValue(() => {}).value)
+expectType<{ a?: true } | undefined>(
+  safeJsonValue({ a: trueValue, b() {} }).value,
 )
 
 expectType<Change[]>(safeJsonValue(undefined).changes)

@@ -17,13 +17,21 @@ export interface Options {
   readonly maxSize?: number
 }
 
-/**
- * Make an object/array deeply optional.
- */
-type PartialDeep<T> = T extends Array<infer ArrayItem>
-  ? Array<PartialDeep<ArrayItem>>
+type InvalidJSONValue = bigint | Function | undefined | symbol
+type ReturnValue<T> = T extends Array<infer ArrayItem>
+  ? Array<ReturnValue<ArrayItem>>
+  : T extends InvalidJSONValue
+  ? undefined
+  : T extends Date
+  ? string
+  : T extends { toJSON(): any }
+  ? ReturnType<T['toJSON']>
   : T extends object
-  ? { [key in keyof T]?: PartialDeep<T[key]> }
+  ? {
+      [key in keyof T as T[key] extends InvalidJSONValue
+        ? never
+        : Exclude<key, symbol>]?: ReturnValue<T[key]>
+    }
   : T
 
 type ReasonWithError = 'uncaughtException' | 'unsafeGetter' | 'unsafeToJSON'
@@ -123,7 +131,7 @@ export default function safeJsonValue<T>(
    * The top-level `value` itself might be changed (including to `undefined`) if
    * it is either invalid JSON or has a `toJSON()` method.
    */
-  value: PartialDeep<T> | undefined
+  value: ReturnValue<T> | undefined
 
   /**
    * List of changes applied to `value`.
