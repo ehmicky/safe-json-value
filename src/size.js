@@ -21,7 +21,7 @@ import { safeGetChangeProp } from './get.js'
 //    serialized value
 //  - This allows checking for strings being too large with `=== undefined`
 //    instead of inspecting the `changes`
-// The top-level itself might become `undefined` if either:
+// The top-level value itself might become `undefined` if either:
 //  - The `maxSize` option is very low (which is unlikely)
 //  - The top-level value is a very long string
 // This is applied incrementally, in a depth-first manner, so that omitted
