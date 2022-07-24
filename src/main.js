@@ -299,7 +299,7 @@ const recurseArray = function ({
 }) {
   const newArray = []
   // eslint-disable-next-line fp/no-let
-  let state = { emptyArray: true, size }
+  let state = { empty: true, size }
 
   // eslint-disable-next-line fp/no-loops, fp/no-mutation, fp/no-let
   for (let index = 0; index < array.length; index += 1) {
@@ -313,7 +313,7 @@ const recurseArray = function ({
       newArray,
       key: index,
       type: 'arrayItem',
-      context: { emptyArray: state.emptyArray, array, index },
+      context: { empty: state.empty, array, index },
       state,
     })
   }
@@ -337,7 +337,7 @@ const recurseObject = function ({
 }) {
   const newObject = getNewObject(object)
   // eslint-disable-next-line fp/no-let
-  let state = { emptyObject: true, size }
+  let state = { empty: true, size }
 
   // eslint-disable-next-line fp/no-loops
   for (const key of Reflect.ownKeys(object)) {
@@ -351,7 +351,7 @@ const recurseObject = function ({
       newObject,
       key,
       type: 'objectProp',
-      context: { emptyObject: state.emptyObject, object, key },
+      context: { empty: state.empty, object, key },
       state,
     })
   }
@@ -423,7 +423,7 @@ const recurseArrayItem = function ({
 
   // eslint-disable-next-line fp/no-mutating-methods
   newArray.push(value)
-  return { emptyArray: false, size: sizeB }
+  return { empty: false, size: sizeB }
 }
 
 const recurseObjectProp = function ({
@@ -468,7 +468,7 @@ const recurseObjectProp = function ({
 
   // eslint-disable-next-line fp/no-mutation, no-param-reassign
   newObject[key] = value
-  return { emptyObject: false, size: sizeB }
+  return { empty: false, size: sizeB }
 }
 
 // Recurse over an object property or array index
@@ -683,18 +683,18 @@ const SIZED_TYPES = {
     },
   },
   arrayItem: {
-    getSize({ emptyArray }) {
-      return emptyArray ? 0 : 1
+    getSize({ empty }) {
+      return empty ? 0 : 1
     },
     getOldValue({ array, index }) {
       return safeGetChangeProp(array, index)
     },
   },
   objectProp: {
-    getSize({ key, emptyObject }) {
+    getSize({ key, empty }) {
       return typeof key === 'symbol'
         ? 0
-        : JSON.stringify(key).length + (emptyObject ? 1 : 2)
+        : JSON.stringify(key).length + (empty ? 1 : 2)
     },
     getOldValue({ object, key }) {
       return safeGetChangeProp(object, key)
