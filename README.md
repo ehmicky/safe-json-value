@@ -11,9 +11,9 @@ JSON serialization should never fail.
 Prevent `JSON.serialize()` from:
 
 - [Throwing](#exceptions)
-- [Changing types](#unexpected-types), [filtering](#filtered-values) or
-  [changing values](#unresolved-values) unexpectedly
-- Returning a [very big output](#big-output)
+- [Changing types](#unexpected-types)
+- [Filtering](#filtered-values) or [transforming values](#unresolved-values)
+  unexpectedly
 
 # Example
 
