@@ -313,7 +313,7 @@ const recurseArray = function ({
       newArray,
       key: index,
       type: 'arrayItem',
-      context: { empty: state.empty, array, index },
+      context: { empty: state.empty, parent: array, index },
       state,
     })
   }
@@ -351,7 +351,7 @@ const recurseObject = function ({
       newObject,
       key,
       type: 'objectProp',
-      context: { empty: state.empty, object, key },
+      context: { empty: state.empty, parent: object, key },
       state,
     })
   }
@@ -686,8 +686,8 @@ const SIZED_TYPES = {
     getSize({ empty }) {
       return empty ? 0 : 1
     },
-    getOldValue({ array, index }) {
-      return safeGetChangeProp(array, index)
+    getOldValue({ parent, index }) {
+      return safeGetChangeProp(parent, index)
     },
   },
   objectProp: {
@@ -696,8 +696,8 @@ const SIZED_TYPES = {
         ? 0
         : JSON.stringify(key).length + (empty ? 1 : 2)
     },
-    getOldValue({ object, key }) {
-      return safeGetChangeProp(object, key)
+    getOldValue({ parent, key }) {
+      return safeGetChangeProp(parent, key)
     },
   },
 }
