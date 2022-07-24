@@ -33,8 +33,27 @@ each(
 )
 
 each(
-  // eslint-disable-next-line unicorn/no-null, no-magic-numbers
-  [{}, [], true, false, null, 0, 0.1, -0, -1, 1e60, 1e-60, '', 'test'],
+  [
+    {},
+    [],
+    true,
+    false,
+    // eslint-disable-next-line unicorn/no-null
+    null,
+    0,
+    // eslint-disable-next-line no-magic-numbers
+    0.1,
+    -0,
+    -1,
+    // eslint-disable-next-line no-magic-numbers
+    1e60,
+    // eslint-disable-next-line no-magic-numbers
+    1e-60,
+    '',
+    'test',
+    '\0',
+    '\u5555',
+  ],
   ({ title }, input) => {
     test(`Computes size correctly | ${title}`, (t) => {
       const size = JSON.stringify(input).length
