@@ -17,11 +17,12 @@ const transformProp = function (parent, key, changes, path) {
   path.push(key)
 
   const prop = safeGetProp(parent, key, changes, path)
-  const propA = transformValue(prop, changes, path)
+  const propA = filterKey(parent, key, prop, changes, path)
+  const propB = transformValue(propA, changes, path)
 
   // eslint-disable-next-line fp/no-mutating-methods
   path.pop()
-  return propA
+  return propB
 }
 
 // eslint-disable-next-line max-params
@@ -30,13 +31,7 @@ const safeGetProp = function (parent, key, changes, path) {
     return getProp(parent, key, changes, path)
   } catch (error) {
     // eslint-disable-next-line fp/no-mutating-methods
-    changes.push({
-      path: [...path],
-      oldValue: undefined,
-      newValue: undefined,
-      reason: 'exception',
-      error,
-    })
+    changes.push({ path: [...path], reason: 'unsafeGetter', error })
   }
 }
 
@@ -52,15 +47,10 @@ const getProp = function (parent, key, changes, path) {
 }
 
 // eslint-disable-next-line max-params
-const addGetterChange = function (changes, path, prop, descriptor) {
-  if ('get' in descriptor || 'set' in descriptor) {
+const addGetterChange = function (changes, path, prop, { get, set }) {
+  if (get !== undefined || set !== undefined) {
     // eslint-disable-next-line fp/no-mutating-methods
-    changes.push({
-      path: [...path],
-      oldValue: prop,
-      newValue: prop,
-      reason: 'getter',
-    })
+    changes.push({ path: [...path], reason: 'getter' })
   }
 }
 
@@ -71,15 +61,42 @@ const addDescriptorChange = function (
   prop,
   { writable, configurable },
 ) {
-  if (writable === false || configurable === false) {
+  if (writable === false) {
+    // eslint-disable-next-line fp/no-mutating-methods
+    changes.push({ path: [...path], reason: 'notWritable' })
+  }
+
+  if (configurable === false) {
+    // eslint-disable-next-line fp/no-mutating-methods
+    changes.push({ path: [...path], reason: 'notConfigurable' })
+  }
+}
+
+// eslint-disable-next-line max-params
+const filterKey = function (parent, key, prop, changes, path) {
+  if (typeof key === 'symbol') {
     // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path: [...path],
       oldValue: prop,
-      newValue: prop,
-      reason: 'descriptor',
+      newValue: undefined,
+      reason: 'symbolKey',
     })
+    return
   }
+
+  if (!isEnum.call(parent, key) && !Array.isArray(parent)) {
+    // eslint-disable-next-line fp/no-mutating-methods
+    changes.push({
+      path: [...path],
+      oldValue: prop,
+      newValue: undefined,
+      reason: 'notEnumerable',
+    })
+    return
+  }
+
+  return prop
 }
 
 const transformValue = function (value, changes, path) {
@@ -109,7 +126,7 @@ const callToJSON = function (value, changes, path) {
       path: [...path],
       oldValue: value,
       newValue: undefined,
-      reason: 'exception',
+      reason: 'unsafeToJSON',
       error,
     })
   }
@@ -161,9 +178,11 @@ const isObject = function (value) {
 
 const recurseArray = function (array, changes, path) {
   const arrayA = []
+  const arrayProps = new Set(KNOWN_ARRAY_PROPS)
 
   // eslint-disable-next-line fp/no-loops, fp/no-mutation, fp/no-let
   for (let index = 0; index < array.length; index += 1) {
+    arrayProps.add(String(index))
     const item = transformProp(array, index, changes, path)
 
     // eslint-disable-next-line max-depth
@@ -173,7 +192,33 @@ const recurseArray = function (array, changes, path) {
     }
   }
 
+  addNotArrayIndexChanges(array, arrayProps, changes, path)
   return arrayA
+}
+
+const KNOWN_ARRAY_PROPS = ['length']
+
+// eslint-disable-next-line max-params
+const addNotArrayIndexChanges = function (array, arrayProps, changes, path) {
+  // eslint-disable-next-line fp/no-loops
+  for (const key of Reflect.ownKeys(array)) {
+    // eslint-disable-next-line max-depth
+    if (!arrayProps.has(key)) {
+      // eslint-disable-next-line fp/no-mutating-methods
+      changes.push({
+        path: [...path, key],
+        oldValue: safeGetArrayProp(array, key),
+        newValue: undefined,
+        reason: 'notArrayIndex',
+      })
+    }
+  }
+}
+
+const safeGetArrayProp = function (array, key) {
+  try {
+    return array[key]
+  } catch {}
 }
 
 const recurseObject = function (object, changes, path) {
@@ -181,7 +226,7 @@ const recurseObject = function (object, changes, path) {
     Object.getPrototypeOf(object) === null ? Object.create(null) : {}
 
   // eslint-disable-next-line fp/no-loops
-  for (const key of Object.keys(object)) {
+  for (const key of Reflect.ownKeys(object)) {
     const prop = transformProp(object, key, changes, path)
 
     // eslint-disable-next-line max-depth
@@ -194,6 +239,8 @@ const recurseObject = function (object, changes, path) {
   addClassChange(object, objectA, changes, path)
   return objectA
 }
+
+const { propertyIsEnumerable: isEnum } = Object.prototype
 
 // eslint-disable-next-line max-params
 const addClassChange = function (object, objectA, changes, path) {
