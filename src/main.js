@@ -357,49 +357,26 @@ const recurseObject = function ({
   maxSize,
 }) {
   const newObject = getNewObject(object)
-  let emptyObject = true
-  let sizeA = size
+  // eslint-disable-next-line fp/no-let
+  let state = { emptyObject: true, size }
 
   // eslint-disable-next-line fp/no-loops
   for (const key of Reflect.ownKeys(object)) {
-    const propPath = [...path, key]
-    const { size: sizeB, stop } = addSize({
-      type: 'objectProp',
-      size: sizeA,
-      maxSize,
-      changes,
-      path: propPath,
-      context: { emptyObject, object, key },
-    })
-
-    if (stop) {
-      continue
-    }
-
-    const { value: prop, size: sizeC } = transformProp({
-      parent: object,
+    // eslint-disable-next-line fp/no-mutation
+    state = recurseProp({
+      path,
       key,
-      changes,
-      ancestors,
-      path: propPath,
-      size: sizeB,
       maxSize,
+      changes,
+      object,
+      ancestors,
+      newObject,
+      state,
     })
-
-    // eslint-disable-next-line max-depth
-    if (prop !== undefined) {
-      if (emptyObject) {
-        emptyObject = false
-      }
-
-      sizeA = sizeC
-      // eslint-disable-next-line fp/no-mutation
-      newObject[key] = prop
-    }
   }
 
   addClassChange({ object, newObject, changes, path })
-  return { value: newObject, size: sizeA }
+  return { value: newObject, size: state.size }
 }
 
 // When the object has a `null` prototype, we keep it.
@@ -421,6 +398,50 @@ const addClassChange = function ({ object, newObject, changes, path }) {
       reason: 'class',
     })
   }
+}
+
+const recurseProp = function ({
+  path,
+  key,
+  maxSize,
+  changes,
+  object,
+  ancestors,
+  newObject,
+  state,
+  state: { emptyObject, size },
+}) {
+  const propPath = [...path, key]
+  const { size: sizeA, stop } = addSize({
+    type: 'objectProp',
+    size,
+    maxSize,
+    changes,
+    path: propPath,
+    context: { emptyObject, object, key },
+  })
+
+  if (stop) {
+    return state
+  }
+
+  const { value, size: sizeB } = transformProp({
+    parent: object,
+    key,
+    changes,
+    ancestors,
+    path: propPath,
+    size: sizeA,
+    maxSize,
+  })
+
+  if (value === undefined) {
+    return state
+  }
+
+  // eslint-disable-next-line fp/no-mutation, no-param-reassign
+  newObject[key] = value
+  return { emptyObject: false, size: sizeB }
 }
 
 // Recurse over an object property or array index
