@@ -11,100 +11,6 @@ export default function safeJsonValue(
   return { value: valueA, changes }
 }
 
-const transformProp = function ({ parent, key, changes, path }) {
-  const pathA = [...path, key]
-  const prop = safeGetProp({ parent, key, changes, path: pathA })
-  const propA = filterKey({ parent, key, prop, changes, path: pathA })
-  const propB = transformValue(propA, changes, pathA)
-  return propB
-}
-
-const safeGetProp = function ({ parent, key, changes, path }) {
-  try {
-    return getProp({ parent, key, changes, path })
-  } catch (error) {
-    changes.push({
-      path,
-      oldValue: undefined,
-      newValue: undefined,
-      reason: 'unsafeGetter',
-      error,
-    })
-  }
-}
-
-// The descriptor is retrieved first in case there is a getter or proxy hook
-// that modifies `parent[key]`
-const getProp = function ({ parent, key, changes, path }) {
-  const descriptor = Object.getOwnPropertyDescriptor(parent, key)
-  const prop = parent[key]
-  addGetterChange({ changes, path, prop, descriptor })
-  addDescriptorChange({ changes, path, prop, descriptor })
-  return prop
-}
-
-const addGetterChange = function ({
-  changes,
-  path,
-  prop,
-  descriptor: { get, set },
-}) {
-  if (get !== undefined || set !== undefined) {
-    changes.push({ path, oldValue: prop, newValue: prop, reason: 'getter' })
-  }
-}
-
-const addDescriptorChange = function ({
-  changes,
-  path,
-  prop,
-  descriptor: { writable, configurable },
-}) {
-  if (writable === false) {
-    changes.push({
-      path,
-      oldValue: prop,
-      newValue: prop,
-      reason: 'notWritable',
-    })
-  }
-
-  if (configurable === false) {
-    changes.push({
-      path,
-      oldValue: prop,
-      newValue: prop,
-      reason: 'notConfigurable',
-    })
-  }
-}
-
-const filterKey = function ({ parent, key, prop, changes, path }) {
-  if (typeof key === 'symbol') {
-    changes.push({
-      path,
-      oldValue: prop,
-      newValue: undefined,
-      reason: 'symbolKey',
-    })
-    return
-  }
-
-  if (!isEnum.call(parent, key) && !Array.isArray(parent)) {
-    changes.push({
-      path,
-      oldValue: prop,
-      newValue: undefined,
-      reason: 'notEnumerable',
-    })
-    return
-  }
-
-  return prop
-}
-
-const { propertyIsEnumerable: isEnum } = Object.prototype
-
 const transformValue = function (value, changes, path) {
   const valueA = callToJSON(value, changes, path)
   const valueB = filterValue(valueA, changes, path)
@@ -256,3 +162,97 @@ const addClassChange = function ({ object, newObject, changes, path }) {
     })
   }
 }
+
+const transformProp = function ({ parent, key, changes, path }) {
+  const pathA = [...path, key]
+  const prop = safeGetProp({ parent, key, changes, path: pathA })
+  const propA = filterKey({ parent, key, prop, changes, path: pathA })
+  const propB = transformValue(propA, changes, pathA)
+  return propB
+}
+
+const safeGetProp = function ({ parent, key, changes, path }) {
+  try {
+    return getProp({ parent, key, changes, path })
+  } catch (error) {
+    changes.push({
+      path,
+      oldValue: undefined,
+      newValue: undefined,
+      reason: 'unsafeGetter',
+      error,
+    })
+  }
+}
+
+// The descriptor is retrieved first in case there is a getter or proxy hook
+// that modifies `parent[key]`
+const getProp = function ({ parent, key, changes, path }) {
+  const descriptor = Object.getOwnPropertyDescriptor(parent, key)
+  const prop = parent[key]
+  addGetterChange({ changes, path, prop, descriptor })
+  addDescriptorChange({ changes, path, prop, descriptor })
+  return prop
+}
+
+const addGetterChange = function ({
+  changes,
+  path,
+  prop,
+  descriptor: { get, set },
+}) {
+  if (get !== undefined || set !== undefined) {
+    changes.push({ path, oldValue: prop, newValue: prop, reason: 'getter' })
+  }
+}
+
+const addDescriptorChange = function ({
+  changes,
+  path,
+  prop,
+  descriptor: { writable, configurable },
+}) {
+  if (writable === false) {
+    changes.push({
+      path,
+      oldValue: prop,
+      newValue: prop,
+      reason: 'notWritable',
+    })
+  }
+
+  if (configurable === false) {
+    changes.push({
+      path,
+      oldValue: prop,
+      newValue: prop,
+      reason: 'notConfigurable',
+    })
+  }
+}
+
+const filterKey = function ({ parent, key, prop, changes, path }) {
+  if (typeof key === 'symbol') {
+    changes.push({
+      path,
+      oldValue: prop,
+      newValue: undefined,
+      reason: 'symbolKey',
+    })
+    return
+  }
+
+  if (!isEnum.call(parent, key) && !Array.isArray(parent)) {
+    changes.push({
+      path,
+      oldValue: prop,
+      newValue: undefined,
+      reason: 'notEnumerable',
+    })
+    return
+  }
+
+  return prop
+}
+
+const { propertyIsEnumerable: isEnum } = Object.prototype
