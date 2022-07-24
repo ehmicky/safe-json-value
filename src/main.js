@@ -553,6 +553,33 @@ const handleUncaughtException = function ({
   return { value: undefined, size }
 }
 
+// Apply `maxSize`, which omits values if they their JSON size would be too
+// high.
+// This is based on the JSON size without any indentation because:
+//  - This removes the need for a `maxSizeIndentation` option
+//  - If value is likely to be big, it is also likely to be serialized without
+//    any indentation to be kept small
+//  - The `maxSize` option is likely to be more of a soft limit than a hard
+//    limit
+//     - A hard limit is more likely when the value is a network request payload
+//       (as opposed to be kept in-memory or as a file), but then it is likely
+//       to be compressed too
+// We use `JSON.stringify()` to compute the length of strings (including
+// property keys) to take into account escaping, including:
+//  - Control characters and Unicode characters
+//  - Invalid Unicode sequences
+// Strings that are too long are completely omitted instead of being truncated:
+//  - This is more consistent with the rest of the library
+//  - The truncation might make the value syntactically invalid, e.g. if it is a
+//    serialized value
+//  - This allows checking for strings being too large with `=== undefined`
+//    instead of inspecting the `changes`
+// The top-level itself might become `undefined` if either:
+//  - The `maxSize` option is very low (which is unlikely)
+//  - The top-level value is a very long string
+// This is applied incrementally, in a depth-first manner, so that omitted
+// fields (due to being over `maxSize`) and their children are not processed
+// at all, for performance reason.
 const addSize = function ({ type, size, maxSize, changes, path, context }) {
   if (maxSize === Number.POSITIVE_INFINITY) {
     return { size, stop: false }
