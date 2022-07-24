@@ -457,6 +457,11 @@ JSON.parse(JSON.stringify(input)) // { one: true }
 safeJsonValue(input).value // { one: true }
 ```
 
+# Related projects
+
+- [`is-json-value`](https://github.com/ehmicky/is-json-value): Check if a value
+  is valid JSON
+
 # Support
 
 For any question, _don't hesitate_ to [submit an issue on GitHub](../../issues).
