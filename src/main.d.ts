@@ -14,7 +14,7 @@ export interface Options {
    * JSON.stringify(safeJsonValue(input, { maxSize: 1e5 }).value) // '{"one":true}"
    * ```
    */
-  maxSize?: number
+  readonly maxSize?: number
 }
 
 /**
@@ -90,7 +90,7 @@ export type Change<ReasonValue extends Reason = Reason> = {
  *    filtered with `JSON.stringify()`
  *  - Resolving properties which would change value with `JSON.stringify()`
  *
- * This never throws.
+ * Applied recursively on object/array properties. This never throws.
  *
  * @example
  * ```js
@@ -124,5 +124,9 @@ export default function safeJsonValue<T>(
    * it is either invalid JSON or has a `toJSON()` method.
    */
   value: PartialDeep<T> | undefined
+
+  /**
+   * List of changes applied to `value`.
+   */
   changes: Change[]
 }

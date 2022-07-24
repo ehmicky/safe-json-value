@@ -66,7 +66,7 @@ Makes `value` [JSON-safe](#changes-1) by:
 - Resolving properties which would [change value](#unresolved-values) with
   `JSON.stringify()`
 
-This never throws.
+Applied recursively on object/array properties. This never throws.
 
 ### Options
 
