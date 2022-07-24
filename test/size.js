@@ -3,8 +3,16 @@ import safeJsonValue from 'safe-json-value'
 import { each } from 'test-each'
 
 each(
+  [undefined, { maxSize: undefined }, { maxSize: Number.POSITIVE_INFINITY }],
+  ({ title }, options) => {
+    test(`Does not apply options.maxSize by default | ${title}`, (t) => {
+      t.deepEqual(safeJsonValue({}, options), { value: {}, changes: [] })
+    })
+  },
+)
+
+each(
   [
-    { input: {}, output: {}, maxSize: Number.POSITIVE_INFINITY, changes: [] },
     { input: { prop: true }, output: { prop: true }, maxSize: 13, changes: [] },
     {
       input: { prop: true },
@@ -51,8 +59,12 @@ each(
     1e-60,
     '',
     'test',
+    '\n',
     '\0',
-    '\u5555',
+    '𝌆',
+    '\uD834\uDF06',
+    '\uDF06\uD834',
+    '\uDEAD',
   ],
   ({ title }, input) => {
     test(`Computes size correctly | ${title}`, (t) => {
