@@ -313,7 +313,6 @@ const recurseArray = function ({
       newArray,
       key: index,
       type: 'arrayItem',
-      context: { empty: state.empty, parent: array, key: index },
       state,
     })
   }
@@ -351,7 +350,6 @@ const recurseObject = function ({
       newObject,
       key,
       type: 'objectProp',
-      context: { empty: state.empty, parent: object, key },
       state,
     })
   }
@@ -390,7 +388,6 @@ const recurseArrayItem = function ({
   newArray,
   key,
   type,
-  context,
   state,
 }) {
   const propPath = [...path, key]
@@ -400,7 +397,7 @@ const recurseArrayItem = function ({
     maxSize,
     changes,
     path: propPath,
-    context,
+    context: { empty: state.empty, parent, key },
   })
 
   if (stop) {
@@ -435,7 +432,6 @@ const recurseObjectProp = function ({
   newObject,
   key,
   type,
-  context,
   state,
 }) {
   const propPath = [...path, key]
@@ -445,7 +441,7 @@ const recurseObjectProp = function ({
     maxSize,
     changes,
     path: propPath,
-    context,
+    context: { empty: state.empty, parent, key },
   })
 
   if (stop) {
