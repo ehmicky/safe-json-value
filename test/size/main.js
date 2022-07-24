@@ -58,8 +58,8 @@ each([...strings], ({ title }, key) => {
     const input = { one: true, [key]: true }
     const size = JSON.stringify(input).length
     t.deepEqual(safeJsonValue(input, { maxSize: size }), {
-      value: input,
       changes: [],
+      value: input,
     })
     t.deepEqual(safeJsonValue(input, { maxSize: size - 1 }), {
       value: { one: true },

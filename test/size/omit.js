@@ -31,10 +31,10 @@ each(
     test(`Omitted values do not count towards options.maxSize | ${title}`, (t) => {
       const maxSize = JSON.stringify(output).length
       t.deepEqual(safeJsonValue(input, { maxSize }), {
-        value: output,
         changes: [
           { path: [key], oldValue: undefined, newValue: undefined, reason },
         ],
+        value: output,
       })
     })
   },
