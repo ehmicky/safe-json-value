@@ -74,3 +74,20 @@ test('Handles object.toJSON() that call the library itself', (t) => {
   t.false('toJSON' in value)
   t.deepEqual(value, { one: true })
 })
+
+test('Handles object.toJSON that are not functions', (t) => {
+  const input = { toJSON: true }
+  const { value, changes } = safeJsonValue(input)
+  t.deepEqual(value, input)
+  t.deepEqual(changes, [])
+})
+
+test('Handles dates', (t) => {
+  const input = new Date()
+  const dateString = input.toJSON()
+  const { value, changes } = safeJsonValue(input)
+  t.deepEqual(value, dateString)
+  t.deepEqual(changes, [
+    { path: [], oldValue: input, newValue: dateString, reason: 'toJSON' },
+  ])
+})
