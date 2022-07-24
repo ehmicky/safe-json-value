@@ -80,25 +80,52 @@ each([...strings], ({ title }, key) => {
   })
 })
 
+const error = new Error('test')
 each(
   [
-    { input: { prop: undefined }, output: {}, key: 'prop' },
-    { input: [1, undefined], output: [1], key: 1 },
+    {
+      input: { prop: undefined },
+      output: {},
+      key: 'prop',
+      change: { reason: 'invalidType' },
+    },
+    {
+      input: { one: true, two: undefined },
+      output: { one: true },
+      key: 'two',
+      sizeIncrement: JSON.stringify('two').length + ','.length + ':'.length - 1,
+      change: { reason: 'invalidType' },
+    },
+    {
+      input: [1, undefined],
+      output: [1],
+      key: 1,
+      change: { reason: 'invalidType' },
+    },
+    {
+      // eslint-disable-next-line fp/no-mutating-methods
+      input: Object.defineProperty({}, 'prop', {
+        get() {
+          throw error
+        },
+        enumerable: true,
+        configurable: true,
+      }),
+      output: {},
+      key: 'prop',
+      change: { reason: 'unsafeGetter', error },
+      title: 'unsafeObjectProp',
+    },
   ],
-  ({ title }, { input, output, key }) => {
-    test(`Does not recurse if object property key or array comma is over options.maxSize | ${title}`, (t) => {
-      const maxSize = JSON.stringify(output).length
+  ({ title }, { input, output, key, sizeIncrement = 0, change }) => {
+    test(`Does not recurse if object property key, property comma or array comma is over options.maxSize | ${title}`, (t) => {
       t.deepEqual(safeJsonValue(input), {
         value: output,
         changes: [
-          {
-            path: [key],
-            oldValue: undefined,
-            newValue: undefined,
-            reason: 'invalidType',
-          },
+          { ...change, path: [key], oldValue: undefined, newValue: undefined },
         ],
       })
+      const maxSize = JSON.stringify(output).length + sizeIncrement
       t.deepEqual(safeJsonValue(input, { maxSize }), {
         value: output,
         changes: [
