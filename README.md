@@ -11,8 +11,9 @@ JSON serialization should never fail.
 Prevent `JSON.serialize()` from:
 
 - [Throwing](#exceptions)
-- Returning an [output so large](#large-output) your application crashes
-- [Changing types](#unexpected-types) unexpectedly
+- Returning an [output too large](#large-output)
+- Changing [types](#unexpected-types) or [values](#unexpected-values)
+  unexpectedly
 
 # Example
 
@@ -68,11 +69,11 @@ Same as input `value` but JSON-safe.
 
 _Type_: `Change[]`
 
-### Changes
+# Changes
 
-#### Exceptions
+## Exceptions
 
-##### Cycles
+### Cycles
 
 <!-- eslint-disable fp/no-mutation -->
 
@@ -83,7 +84,7 @@ JSON.stringify(input) // Throws due to cycle
 JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
 ```
 
-##### BigInt
+### BigInt
 
 ```js
 const input = { one: true, two: 0n }
@@ -91,16 +92,16 @@ JSON.stringify(input) // Throws due to BigInt
 JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
 ```
 
-#### Large output
+## Large output
 
 ```js
 const input = { one: true, two: 'a'.repeat(1e6) }
 JSON.stringify(safeJsonValue(input, { maxSize: 1e5 }).value) // '{"one":true}"
 ```
 
-#### Unexpected types
+## Unexpected types
 
-##### NaN
+### NaN
 
 ```js
 const input = { one: true, two: Number.NaN }
@@ -108,7 +109,9 @@ JSON.stringify(input) // '{"one":true,"two":null}"
 JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
 ```
 
-##### `toJSON()`
+## Unexpected values
+
+### `toJSON()`
 
 <!-- eslint-disable no-unused-expressions -->
 
