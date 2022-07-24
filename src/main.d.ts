@@ -44,13 +44,12 @@ export type Reason = ReasonWithError | ReasonWithoutError
 /**
  *
  */
-export interface Change<ReasonValue extends Reason = Reason> {
+export type Change<ReasonValue extends Reason = Reason> = {
   path: PropertyKey[]
   oldValue: unknown
   newValue: unknown
   reason: ReasonValue
-  error?: ReasonValue extends ReasonWithoutError ? undefined : Error
-}
+} & (ReasonValue extends ReasonWithError ? { error: Error } : {})
 
 /**
  *
