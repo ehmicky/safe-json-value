@@ -44,12 +44,12 @@ type ReasonWithoutError =
   | 'ignoredSymbolKey'
   | 'ignoredSymbolValue'
   | 'ignoredUndefined'
-  | 'maxSize'
   | 'unresolvedClass'
   | 'unresolvedGetter'
   | 'unresolvedToJSON'
   | 'unsafeBigInt'
   | 'unsafeCycle'
+  | 'unsafeSize'
   | 'unstableInfinite'
 
 /**

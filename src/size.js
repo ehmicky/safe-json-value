@@ -47,7 +47,7 @@ export const addSize = function ({
     path,
     oldValue: getOldValue(context),
     newValue: undefined,
-    reason: 'maxSize',
+    reason: 'unsafeSize',
   })
   return { size, stop }
 }

@@ -66,7 +66,7 @@ each(
             path: [key],
             oldValue: undefined,
             newValue: undefined,
-            reason: 'maxSize',
+            reason: 'unsafeSize',
             ...sizeChange,
           },
         ],

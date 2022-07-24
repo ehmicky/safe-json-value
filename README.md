@@ -149,7 +149,7 @@ Reason for the change among:
   [`"ignoredArrayProperty"`](#array-properties)
 - [Unresolved values](#unresolved-values): [`"unresolvedToJSON"`](#tojson),
   [`"unresolvedClass"`](#classes), [`"unresolvedGetter"`](#getters)
-- [Big output](#big-output): [`"maxSize"`](#big-output)
+- [Big output](#big-output): [`"unsafeSize"`](#big-output)
 
 ##### changes[*].error
 

@@ -46,7 +46,12 @@ each(
       t.deepEqual(safeJsonValue(input, { maxSize: size - 1 }), {
         value: undefined,
         changes: [
-          { path: [], oldValue: input, newValue: undefined, reason: 'maxSize' },
+          {
+            path: [],
+            oldValue: input,
+            newValue: undefined,
+            reason: 'unsafeSize',
+          },
         ],
       })
     })
@@ -64,7 +69,12 @@ each([...strings], ({ title }, key) => {
     t.deepEqual(safeJsonValue(input, { maxSize: size - 1 }), {
       value: { one: true },
       changes: [
-        { path: [key], oldValue: true, newValue: undefined, reason: 'maxSize' },
+        {
+          path: [key],
+          oldValue: true,
+          newValue: undefined,
+          reason: 'unsafeSize',
+        },
       ],
     })
   })

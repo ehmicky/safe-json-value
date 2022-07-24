@@ -22,7 +22,7 @@ each(
         {
           value: output,
           changes: [
-            { path, oldValue: true, newValue: undefined, reason: 'maxSize' },
+            { path, oldValue: true, newValue: undefined, reason: 'unsafeSize' },
           ],
         },
       )

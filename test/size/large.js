@@ -13,7 +13,7 @@ test('Handles very large strings', (t) => {
         path: ['one'],
         oldValue: largeString,
         newValue: undefined,
-        reason: 'maxSize',
+        reason: 'unsafeSize',
       },
     ],
   })
@@ -27,7 +27,7 @@ test('Handles very large object properties', (t) => {
         path: [largeString],
         oldValue: true,
         newValue: undefined,
-        reason: 'maxSize',
+        reason: 'unsafeSize',
       },
     ],
   })
