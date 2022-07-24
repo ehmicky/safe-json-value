@@ -1,3 +1,9 @@
+# 1.4.1
+
+## Bug fixes
+
+- Fix description on mobile devices
+
 # 1.4.0
 
 ## Documentation
