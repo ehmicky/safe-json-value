@@ -31,7 +31,13 @@ const safeGetProp = function (parent, key, changes, path) {
     return getProp(parent, key, changes, path)
   } catch (error) {
     // eslint-disable-next-line fp/no-mutating-methods
-    changes.push({ path: [...path], reason: 'unsafeGetter', error })
+    changes.push({
+      path: [...path],
+      oldValue: undefined,
+      newValue: undefined,
+      reason: 'unsafeGetter',
+      error,
+    })
   }
 }
 
@@ -50,7 +56,12 @@ const getProp = function (parent, key, changes, path) {
 const addGetterChange = function (changes, path, prop, { get, set }) {
   if (get !== undefined || set !== undefined) {
     // eslint-disable-next-line fp/no-mutating-methods
-    changes.push({ path: [...path], reason: 'getter' })
+    changes.push({
+      path: [...path],
+      oldValue: prop,
+      newValue: prop,
+      reason: 'getter',
+    })
   }
 }
 
@@ -63,12 +74,22 @@ const addDescriptorChange = function (
 ) {
   if (writable === false) {
     // eslint-disable-next-line fp/no-mutating-methods
-    changes.push({ path: [...path], reason: 'notWritable' })
+    changes.push({
+      path: [...path],
+      oldValue: prop,
+      newValue: prop,
+      reason: 'notWritable',
+    })
   }
 
   if (configurable === false) {
     // eslint-disable-next-line fp/no-mutating-methods
-    changes.push({ path: [...path], reason: 'notConfigurable' })
+    changes.push({
+      path: [...path],
+      oldValue: prop,
+      newValue: prop,
+      reason: 'notConfigurable',
+    })
   }
 }
 
