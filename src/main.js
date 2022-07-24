@@ -4,7 +4,7 @@ export default function safeJsonValue(
   { maxSize = Number.POSITIVE_INFINITY } = {},
 ) {
   const changes = []
-  const valueA = transformValue(value, changes, [])
+  const valueA = recurseValue(value, changes, [])
   return { value: valueA, changes }
 }
 
@@ -14,7 +14,7 @@ const transformProp = function (parent, key, changes, path) {
   path.push(key)
 
   const prop = safeGetProp(parent, key, changes, path)
-  const propA = transformValue(prop, changes, path)
+  const propA = recurseValue(prop, changes, path)
 
   // eslint-disable-next-line fp/no-mutating-methods
   path.pop()
@@ -72,37 +72,45 @@ const addDescriptorChange = function (changes, path, prop, descriptor) {
   }
 }
 
-const transformValue = function (value, changes, path) {
+const recurseValue = function (value, changes, path) {
   if (typeof value !== 'object' || value === null) {
     return value
   }
 
   return Array.isArray(value)
-    ? transformArray(value, changes, path)
-    : transformObject(value, changes, path)
+    ? recurseArray(value, changes, path)
+    : recurseObject(value, changes, path)
 }
 
-const transformArray = function (array, changes, path) {
+const recurseArray = function (array, changes, path) {
   const arrayA = []
 
   // eslint-disable-next-line fp/no-loops, fp/no-mutation, fp/no-let
   for (let index = 0; index < array.length; index += 1) {
     const item = transformProp(array, index, changes, path)
-    // eslint-disable-next-line fp/no-mutating-methods
-    arrayA.push(item)
+
+    // eslint-disable-next-line max-depth
+    if (item !== undefined) {
+      // eslint-disable-next-line fp/no-mutating-methods
+      arrayA.push(item)
+    }
   }
 
   return arrayA
 }
 
-const transformObject = function (object, changes, path) {
+const recurseObject = function (object, changes, path) {
   const objectA = {}
 
   // eslint-disable-next-line fp/no-loops
   for (const key of Object.keys(object)) {
     const prop = transformProp(object, key, changes, path)
-    // eslint-disable-next-line fp/no-mutation
-    objectA[key] = prop
+
+    // eslint-disable-next-line max-depth
+    if (prop !== undefined) {
+      // eslint-disable-next-line fp/no-mutation
+      objectA[key] = prop
+    }
   }
 
   return objectA
