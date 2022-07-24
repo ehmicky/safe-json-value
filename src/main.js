@@ -289,7 +289,6 @@ const isObject = function (value) {
 //    behavior
 // Omitted items are filtered out.
 //  - Otherwise, `JSON.stringify()` would transform them to `null`
-// eslint-disable-next-line max-statements
 const recurseArray = function ({
   array,
   changes,
