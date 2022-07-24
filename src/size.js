@@ -11,10 +11,6 @@ import { safeGetChangeProp } from './get.js'
 //     - A hard limit is more likely when the value is a network request payload
 //       (as opposed to be kept in-memory or as a file), but then it is likely
 //       to be compressed too
-// We use `JSON.stringify()` to compute the length of strings (including
-// property keys) to take into account escaping, including:
-//  - Control characters and Unicode characters
-//  - Invalid Unicode sequences
 // Strings that are too long are completely omitted instead of being truncated:
 //  - This is more consistent with the rest of the library
 //  - The truncation might make the value syntactically invalid, e.g. if it is a
@@ -70,7 +66,7 @@ const SIZED_TYPES = {
 
       return typeof value === 'object' && value !== null
         ? 2
-        : JSON.stringify(value).length
+        : getJsonLength(value)
     },
     getOldValue(value) {
       return value
@@ -84,10 +80,21 @@ const SIZED_TYPES = {
   },
   objectProp: {
     getSize({ key, empty }) {
-      return typeof key === 'symbol'
-        ? 0
-        : JSON.stringify(key).length + (empty ? 1 : 2)
+      return typeof key === 'symbol' ? 0 : getJsonLength(key) + (empty ? 1 : 2)
     },
     getOldValue: safeGetChangeProp,
   },
+}
+
+// We use `JSON.stringify()` to compute the length of strings (including
+// property keys) to take into account escaping, including:
+//  - Control characters and Unicode characters
+//  - Invalid Unicode sequences
+// This can throw if `value` is a large strings with many backslash sequences.
+const getJsonLength = function (value) {
+  try {
+    return JSON.stringify(value).length
+  } catch {
+    return Number.POSITIVE_INFINITY
+  }
 }

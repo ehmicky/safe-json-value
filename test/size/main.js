@@ -69,3 +69,21 @@ each([...strings], ({ title }, key) => {
     })
   })
 })
+
+const V8_MAX_STRING_LENGTH = 5e8
+const largeString = '\n'.repeat(V8_MAX_STRING_LENGTH)
+
+test('Handles very large strings', (t) => {
+  const maxSize = JSON.stringify({ one: '' }).length
+  t.deepEqual(safeJsonValue({ one: largeString }, { maxSize }), {
+    value: {},
+    changes: [
+      {
+        path: ['one'],
+        oldValue: largeString,
+        newValue: undefined,
+        reason: 'maxSize',
+      },
+    ],
+  })
+})
