@@ -43,7 +43,7 @@ const addGetterChange = function ({
   descriptor: { get, set },
 }) {
   if (get !== undefined || set !== undefined) {
-    changes.push({ path, oldValue: prop, newValue: prop, reason: 'getter' })
+    changes.push({ path, oldValue: get, newValue: prop, reason: 'getter' })
   }
 }
 
