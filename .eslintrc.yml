@@ -1,1 +1,5 @@
 extends: '@ehmicky/eslint-config/.eslintrc.yml'
+rules:
+  fp/no-mutating-methods:
+    - 2
+    - allowedObjects: [changes]

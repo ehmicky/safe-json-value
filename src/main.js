@@ -23,7 +23,6 @@ const safeGetProp = function ({ parent, key, changes, path }) {
   try {
     return getProp({ parent, key, changes, path })
   } catch (error) {
-    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: undefined,
@@ -51,7 +50,6 @@ const addGetterChange = function ({
   descriptor: { get, set },
 }) {
   if (get !== undefined || set !== undefined) {
-    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({ path, oldValue: prop, newValue: prop, reason: 'getter' })
   }
 }
@@ -63,7 +61,6 @@ const addDescriptorChange = function ({
   descriptor: { writable, configurable },
 }) {
   if (writable === false) {
-    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: prop,
@@ -73,7 +70,6 @@ const addDescriptorChange = function ({
   }
 
   if (configurable === false) {
-    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: prop,
@@ -85,7 +81,6 @@ const addDescriptorChange = function ({
 
 const filterKey = function ({ parent, key, prop, changes, path }) {
   if (typeof key === 'symbol') {
-    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: prop,
@@ -96,7 +91,6 @@ const filterKey = function ({ parent, key, prop, changes, path }) {
   }
 
   if (!isEnum.call(parent, key) && !Array.isArray(parent)) {
-    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: prop,
@@ -124,7 +118,6 @@ const callToJSON = function (value, changes, path) {
 
   try {
     const toJSONResult = value.toJSON()
-    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: value,
@@ -133,7 +126,6 @@ const callToJSON = function (value, changes, path) {
     })
     return toJSONResult
   } catch (error) {
-    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: value,
@@ -155,7 +147,6 @@ const filterValue = function (value, changes, path) {
     return value
   }
 
-  // eslint-disable-next-line fp/no-mutating-methods
   changes.push({
     path,
     oldValue: value,
@@ -220,7 +211,6 @@ const addNotArrayIndexChanges = function ({
   for (const key of Reflect.ownKeys(array)) {
     // eslint-disable-next-line max-depth
     if (!arrayProps.has(key)) {
-      // eslint-disable-next-line fp/no-mutating-methods
       changes.push({
         path: [...path, key],
         oldValue: safeGetArrayProp(array, key),
@@ -258,7 +248,6 @@ const recurseObject = function (object, changes, path) {
 
 const addClassChange = function ({ object, newObject, changes, path }) {
   if (!isPlainObj(object)) {
-    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: object,
