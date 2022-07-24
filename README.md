@@ -11,8 +11,8 @@ JSON serialization should never fail.
 Prevent `JSON.serialize()` from:
 
 - [Throwing](#exceptions)
-- Changing [types](#unexpected-types) or [values](#unresolved-values)
-  unexpectedly
+- [Changing types](#unexpected-types), [filtering](#filtered-values) or
+  [changing values](#unresolved-values) unexpectedly
 - Returning a [very big output](#big-output)
 
 # Example
@@ -115,6 +115,15 @@ _Type_: `string`
 Reason for the change among:
 
 - [`"cycle"`](#cycles)
+- [`"invalidType"`](#functions)
+- [`"uncaughtException"`](#infinite-recursion)
+
+##### changes[*].error
+
+_Type_: `error?`
+
+Error that triggered the change. Only if [`reason`](#changesreason) is one of:
+`"uncaughtException"`.
 
 # Changes
 
@@ -135,6 +144,14 @@ JSON.stringify(input) // Throws due to cycle
 JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
 ```
 
+### Infinite recursion
+
+```js
+const input = { toJSON: () => ({ one: true, input: { ...input } }) }
+JSON.stringify(input) // Throws due to infinite recursion
+JSON.stringify(safeJsonValue(input).value) // '{"one":true,"input":{}}"
+```
+
 ### BigInt
 
 ```js
@@ -148,12 +165,57 @@ JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
 `JSON.stringify()` changes the types of specific values unexpectedly. Those are
 omitted.
 
-### NaN
+### NaN and Infinity
 
 ```js
-const input = { one: true, two: Number.NaN }
-JSON.stringify(input) // '{"one":true,"two":null}"
+const input = { one: true, two: Number.NaN, three: Number.POSITIVE_INFINITY }
+JSON.stringify(input) // '{"one":true,"two":null,"three":null}"
 JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
+```
+
+## Filtered values
+
+`JSON.stringify()` omits some specific types. Those are omitted right away to
+prevent any unexpected output.
+
+### Functions
+
+<!-- eslint-disable no-unused-expressions -->
+
+```js
+const input = { one: true, two() {} }
+JSON.parse(JSON.stringify(input)) // { one: true }
+safeJsonValue(input).value // { one: true }
+```
+
+### `undefined`
+
+<!-- eslint-disable no-unused-expressions -->
+
+```js
+const input = { one: true, two: undefined }
+JSON.parse(JSON.stringify(input)) // { one: true }
+safeJsonValue(input).value // { one: true }
+```
+
+### Symbol values
+
+<!-- eslint-disable no-unused-expressions, symbol-description -->
+
+```js
+const input = { one: true, two: Symbol() }
+JSON.parse(JSON.stringify(input)) // { one: true }
+safeJsonValue(input).value // { one: true }
+```
+
+### Symbol keys
+
+<!-- eslint-disable no-unused-expressions, symbol-description -->
+
+```js
+const input = { one: true, [Symbol()]: true }
+JSON.parse(JSON.stringify(input)) // { one: true }
+safeJsonValue(input).value // { one: true }
 ```
 
 ## Unresolved values
