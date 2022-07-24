@@ -60,8 +60,9 @@ _Return value_: [`object`](#return-value)
 
 Makes `value` [JSON-safe](#changes-1) by:
 
-- Omitting properties which would either [throw](#exceptions) or
-  [change type](#unexpected-types) unexpectedly with `JSON.stringify()`
+- Omitting properties which would [throw](#exceptions),
+  [change type unexpectedly](#unexpected-types) or
+  [be filtered](#filtered-values) with `JSON.stringify()`
 - Resolving properties which would [change value](#unresolved-values) with
   `JSON.stringify()`
 
