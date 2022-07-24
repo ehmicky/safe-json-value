@@ -78,3 +78,31 @@ each([...strings], ({ title }, key) => {
     })
   })
 })
+
+test('Does not recurse if object property key too big', (t) => {
+  const input = { prop: undefined }
+  const output = {}
+  const size = JSON.stringify(output).length
+  t.deepEqual(safeJsonValue(input), {
+    value: output,
+    changes: [
+      {
+        path: ['prop'],
+        oldValue: undefined,
+        newValue: undefined,
+        reason: 'invalidType',
+      },
+    ],
+  })
+  t.deepEqual(safeJsonValue(input, { maxSize: size }), {
+    value: output,
+    changes: [
+      {
+        path: ['prop'],
+        oldValue: undefined,
+        newValue: undefined,
+        reason: 'maxSize',
+      },
+    ],
+  })
+})
