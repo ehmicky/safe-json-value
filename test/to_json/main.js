@@ -10,7 +10,7 @@ test('Calls object.toJSON()', (t) => {
   const { value, changes } = safeJsonValue(input)
   t.true(value)
   t.deepEqual(changes, [
-    { path: [], oldValue: input, newValue: true, reason: 'toJSON' },
+    { path: [], oldValue: input, newValue: true, reason: 'unresolvedToJSON' },
   ])
 })
 
@@ -23,13 +23,13 @@ test('Handles object.toJSON() returning undefined', (t) => {
       path: ['prop'],
       oldValue: input.prop,
       newValue: undefined,
-      reason: 'toJSON',
+      reason: 'unresolvedToJSON',
     },
     {
       path: ['prop'],
       oldValue: undefined,
       newValue: undefined,
-      reason: 'undefined',
+      reason: 'ignoredUndefined',
     },
   ])
 })
@@ -55,7 +55,7 @@ test('Handles object.toJSON() that throws', (t) => {
       path: [],
       oldValue: undefined,
       newValue: undefined,
-      reason: 'undefined',
+      reason: 'ignoredUndefined',
     },
   ])
 })
@@ -69,11 +69,11 @@ test('Handles object.toJSON that are not functions', (t) => {
 
 test('Handles dates', (t) => {
   const input = new Date()
-  const dateString = input.toJSON()
+  const newValue = input.toJSON()
   const { value, changes } = safeJsonValue(input)
-  t.deepEqual(value, dateString)
+  t.deepEqual(value, newValue)
   t.deepEqual(changes, [
-    { path: [], oldValue: input, newValue: dateString, reason: 'toJSON' },
+    { path: [], oldValue: input, newValue, reason: 'unresolvedToJSON' },
   ])
 })
 
@@ -83,12 +83,12 @@ test('Does not call object.toJSON() recursively', (t) => {
   const { value, changes } = safeJsonValue(input)
   t.deepEqual(value, { prop: true })
   t.deepEqual(changes, [
-    { path: [], oldValue: input, newValue, reason: 'toJSON' },
+    { path: [], oldValue: input, newValue, reason: 'unresolvedToJSON' },
     {
       path: ['toJSON'],
       oldValue: newValue.toJSON,
       newValue: undefined,
-      reason: 'function',
+      reason: 'ignoredFunction',
     },
   ])
 })

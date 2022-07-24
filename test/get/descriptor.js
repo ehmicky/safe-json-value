@@ -6,11 +6,11 @@ each(
   [
     {
       descriptor: { configurable: false, writable: true },
-      reason: 'notConfigurable',
+      reason: 'descriptorNotConfigurable',
     },
     {
       descriptor: { configurable: true, writable: false },
-      reason: 'notWritable',
+      reason: 'descriptorNotWritable',
     },
   ],
   ({ title }, { descriptor, reason }) => {

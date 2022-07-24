@@ -24,10 +24,10 @@ each(
       input: { [symbol]: undefined, prop: true },
       output: { prop: true },
       key: symbol,
-      reason: 'symbolKey',
+      reason: 'ignoredSymbolKey',
     },
   ],
-  ({ title }, { input, output, key, reason = 'undefined' }) => {
+  ({ title }, { input, output, key, reason = 'ignoredUndefined' }) => {
     test(`Omitted values do not count towards options.maxSize | ${title}`, (t) => {
       const maxSize = JSON.stringify(output).length
       t.deepEqual(safeJsonValue(input, { maxSize }), {

@@ -64,7 +64,7 @@ const addClassChange = function ({ object, newObject, changes, path }) {
       path,
       oldValue: object,
       newValue: newObject,
-      reason: 'class',
+      reason: 'unresolvedClass',
     })
   }
 }

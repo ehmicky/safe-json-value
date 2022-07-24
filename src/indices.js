@@ -18,7 +18,7 @@ export const addNotArrayIndexChanges = function (array, changes, path) {
         path: [...path, key],
         oldValue: safeGetChangeProp({ parent: array, key }),
         newValue: undefined,
-        reason: 'notArrayIndex',
+        reason: 'ignoredArrayProperty',
       })
     }
   }

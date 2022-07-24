@@ -22,7 +22,7 @@ export const checkCycleThenRecurse = function ({
       path,
       oldValue: value,
       newValue: undefined,
-      reason: 'cycle',
+      reason: 'unsafeCycle',
     })
     return { value: undefined, size }
   }

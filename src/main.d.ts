@@ -34,23 +34,23 @@ type ReturnValue<T> = T extends Array<infer ArrayItem>
     }
   : T
 
-type ReasonWithError = 'uncaughtException' | 'unsafeGetter' | 'unsafeToJSON'
+type ReasonWithError = 'unsafeException' | 'unsafeGetter' | 'unsafeToJSON'
 type ReasonWithoutError =
-  | 'bigint'
-  | 'class'
-  | 'cycle'
-  | 'function'
-  | 'getter'
-  | 'infiniteNumber'
+  | 'descriptorNotConfigurable'
+  | 'descriptorNotWritable'
+  | 'ignoredArrayProperty'
+  | 'ignoredFunction'
+  | 'ignoredNotEnumerable'
+  | 'ignoredSymbolKey'
+  | 'ignoredSymbolValue'
+  | 'ignoredUndefined'
   | 'maxSize'
-  | 'notArrayIndex'
-  | 'notEnumerable'
-  | 'notConfigurable'
-  | 'notWritable'
-  | 'symbolKey'
-  | 'symbolValue'
-  | 'toJSON'
-  | 'undefined'
+  | 'unresolvedClass'
+  | 'unresolvedGetter'
+  | 'unresolvedToJSON'
+  | 'unsafeBigInt'
+  | 'unsafeCycle'
+  | 'unstableInfinite'
 
 /**
  * Reason why a property was changed.
@@ -115,7 +115,7 @@ export type Change<ReasonValue extends Reason = Reason> = {
  * //     path: ['self'],
  * //     oldValue: <ref *1> { one: true, self: [Circular *1] },
  * //     newValue: undefined,
- * //     reason: 'cycle'
+ * //     reason: 'unsafeCycle'
  * //   }
  * // ]
  * ```

@@ -20,7 +20,7 @@ export const callToJSON = function (value, changes, path) {
       path,
       oldValue: value,
       newValue: toJSONResult,
-      reason: 'toJSON',
+      reason: 'unresolvedToJSON',
     })
     return toJSONResult
   } catch (error) {

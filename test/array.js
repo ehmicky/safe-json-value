@@ -9,7 +9,7 @@ test('Omit removed properties', (t) => {
         path: [1],
         oldValue: undefined,
         newValue: undefined,
-        reason: 'undefined',
+        reason: 'ignoredUndefined',
       },
     ],
   })

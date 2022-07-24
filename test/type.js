@@ -4,13 +4,13 @@ import { each } from 'test-each'
 
 each(
   [
-    { value: () => {}, reason: 'function' },
-    { value: Symbol('test'), reason: 'symbolValue' },
-    { value: undefined, reason: 'undefined' },
-    { value: 0n, reason: 'bigint' },
-    { value: Number.NaN, reason: 'infiniteNumber' },
-    { value: Number.POSITIVE_INFINITY, reason: 'infiniteNumber' },
-    { value: Number.NEGATIVE_INFINITY, reason: 'infiniteNumber' },
+    { value: () => {}, reason: 'ignoredFunction' },
+    { value: Symbol('test'), reason: 'ignoredSymbolValue' },
+    { value: undefined, reason: 'ignoredUndefined' },
+    { value: 0n, reason: 'unsafeBigInt' },
+    { value: Number.NaN, reason: 'unstableInfinite' },
+    { value: Number.POSITIVE_INFINITY, reason: 'unstableInfinite' },
+    { value: Number.NEGATIVE_INFINITY, reason: 'unstableInfinite' },
   ],
   [
     { getInput: (value) => value, output: undefined, change: { path: [] } },

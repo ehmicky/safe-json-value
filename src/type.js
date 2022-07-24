@@ -21,13 +21,13 @@ const getInvalidTypeReason = function (value) {
   }
 
   if (type === 'number' && !Number.isFinite(value)) {
-    return 'infiniteNumber'
+    return 'unstableInfinite'
   }
 }
 
 const INVALID_TYPES = {
-  function: 'function',
-  symbol: 'symbolValue',
-  undefined: 'undefined',
-  bigint: 'bigint',
+  function: 'ignoredFunction',
+  symbol: 'ignoredSymbolValue',
+  undefined: 'ignoredUndefined',
+  bigint: 'unsafeBigInt',
 }

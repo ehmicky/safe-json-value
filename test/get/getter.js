@@ -45,7 +45,12 @@ each(
       t.deepEqual(safeJsonValue(input), {
         value: { prop: true },
         changes: [
-          { path: ['prop'], oldValue: get, newValue: true, reason: 'getter' },
+          {
+            path: ['prop'],
+            oldValue: get,
+            newValue: true,
+            reason: 'unresolvedGetter',
+          },
         ],
       })
     })
@@ -55,21 +60,12 @@ each(
 test('Resolve setters without getters', (t) => {
   // eslint-disable-next-line fp/no-get-set, accessor-pairs
   const input = { set prop(_) {} }
+  const change = { path: ['prop'], newValue: undefined, oldValue: undefined }
   t.deepEqual(safeJsonValue(input), {
     value: {},
     changes: [
-      {
-        path: ['prop'],
-        newValue: undefined,
-        oldValue: undefined,
-        reason: 'getter',
-      },
-      {
-        path: ['prop'],
-        oldValue: undefined,
-        newValue: undefined,
-        reason: 'undefined',
-      },
+      { ...change, reason: 'unresolvedGetter' },
+      { ...change, reason: 'ignoredUndefined' },
     ],
   })
 })

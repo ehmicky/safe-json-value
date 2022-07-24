@@ -8,6 +8,11 @@ test('Omit circular values', (t) => {
   const { value, changes } = safeJsonValue(input)
   t.false('self' in value)
   t.deepEqual(changes, [
-    { path: ['self'], oldValue: input, newValue: undefined, reason: 'cycle' },
+    {
+      path: ['self'],
+      oldValue: input,
+      newValue: undefined,
+      reason: 'unsafeCycle',
+    },
   ])
 })

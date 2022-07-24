@@ -11,7 +11,7 @@
 //  - When a `get` method or Proxy hook (not `object.toJSON()`)
 //  - Calls this library itself
 //  - Passing a reference (not a copy) to itself or to an ancestor
-export const handleUncaughtException = function ({
+export const handleUnsafeException = function ({
   value,
   changes,
   path,
@@ -22,7 +22,7 @@ export const handleUncaughtException = function ({
     path,
     oldValue: value,
     newValue: undefined,
-    reason: 'uncaughtException',
+    reason: 'unsafeException',
     error,
   })
   return { value: undefined, size }

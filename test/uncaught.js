@@ -31,7 +31,7 @@ each(
       t.true(Array.isArray(lastChange.path) && lastChange.path.every(isProp))
       t.is(typeof lastChange.oldValue, 'object')
       t.is(lastChange.newValue, undefined)
-      t.is(lastChange.reason, 'uncaughtException')
+      t.is(lastChange.reason, 'unsafeException')
     })
   },
 )

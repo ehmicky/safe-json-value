@@ -35,7 +35,7 @@ console.log(changes) // List of changed properties
 //     path: ['self'],
 //     oldValue: <ref *1> { one: true, self: [Circular *1] },
 //     newValue: undefined,
-//     reason: 'cycle'
+//     reason: 'unsafeCycle'
 //   }
 // ]
 ```
@@ -131,24 +131,29 @@ Property value after the change. `undefined` means the property was omitted.
 
 _Type_: `string`
 
-Reason for the change among: [`"bigint"`](#bigint), [`"class"`](#classes),
-[`"cycle"`](#cycles), [`"function"`](#functions), [`"getter"`](#getters),
-[`"infiniteNumber"`](#nan-and-infinity), [`"maxSize"`](#big-output),
-[`"notArrayIndex"`](#array-properties),
-[`"notEnumerable"`](#non-enumerable-keys),
-[`"notConfigurable"`](#non-configurable-properties),
-[`"notWritable"`](#non-writable-properties), [`"symbolKey"`](#symbol-keys),
-[`"symbolValue"`](#symbol-values), [`"toJSON"`](#tojson),
-[`"uncaughtException"`](#infinite-recursion), [`"undefined"`](#undefined),
-[`"unsafeGetter"`](#exceptions-in-getters) or
-[`"unsafeToJSON"`](#exceptions-in-tojson).
+Reason for the change among:
+
+- [`"unsafeCycle"`](#cycles), [`"unsafeException"`](#infinite-recursion),
+  [`"unsafeBigInt"`](#bigint), [`"unsafeToJSON"`](#exceptions-in-tojson),
+  [`"unsafeGetter"`](#exceptions-in-getters)
+- [`"descriptorNotWritable"`](#non-writable-properties),
+  [`"descriptorNotConfigurable"`](#non-configurable-properties)
+- [`"unstableInfinite"`](#nan-and-infinity)
+- [`"ignoredFunction"`](#functions), [`"ignoredUndefined"`](#undefined),
+  [`"ignoredSymbolValue"`](#symbol-values),
+  [`"ignoredSymbolKey"`](#symbol-keys),
+  [`"ignoredNotEnumerable"`](#non-enumerable-keys),
+  [`"ignoredArrayProperty"`](#array-properties)
+- [`"unresolvedToJSON"`](#tojson), [`"unresolvedClass"`](#classes),
+  [`"unresolvedGetter"`](#getters)
+- [`"maxSize"`](#big-output)
 
 ##### changes[*].error
 
 _Type_: `Error?`
 
 Error that triggered the change. Only present if [`reason`](#changesreason) is
-[`"uncaughtException"`](#infinite-recursion),
+[`"unsafeException"`](#infinite-recursion),
 [`"unsafeGetter"`](#exceptions-in-getters) or
 [`"unsafeToJSON"`](#exceptions-in-tojson).
 

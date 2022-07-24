@@ -7,7 +7,7 @@ export const omitInvalidKey = function ({ parent, key, prop, changes, path }) {
       path,
       oldValue: prop,
       newValue: undefined,
-      reason: 'symbolKey',
+      reason: 'ignoredSymbolKey',
     })
     return { prop: undefined, validKey: false }
   }
@@ -17,7 +17,7 @@ export const omitInvalidKey = function ({ parent, key, prop, changes, path }) {
       path,
       oldValue: prop,
       newValue: undefined,
-      reason: 'notEnumerable',
+      reason: 'ignoredNotEnumerable',
     })
     return { prop: undefined, validKey: false }
   }

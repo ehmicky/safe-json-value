@@ -33,7 +33,7 @@ each(
           path: [key],
           oldValue,
           newValue: undefined,
-          reason: 'notArrayIndex',
+          reason: 'ignoredArrayProperty',
         },
       ])
     })

@@ -17,7 +17,7 @@ test('Omit removed properties', (t) => {
       path: ['prop'],
       oldValue: undefined,
       newValue: undefined,
-      reason: 'undefined',
+      reason: 'ignoredUndefined',
     },
   ])
   t.false('prop' in value)
@@ -30,7 +30,12 @@ test('Convert any objects to plain objects', (t) => {
   t.deepEqual(safeJsonValue(set), {
     value: { prop: true },
     changes: [
-      { path: [], oldValue: set, newValue: { prop: true }, reason: 'class' },
+      {
+        path: [],
+        oldValue: set,
+        newValue: { prop: true },
+        reason: 'unresolvedClass',
+      },
     ],
   })
 })

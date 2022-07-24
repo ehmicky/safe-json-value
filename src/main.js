@@ -3,7 +3,7 @@ import { addNotArrayIndexChanges } from './indices.js'
 import { addSize, DEFAULT_MAX_SIZE } from './size.js'
 import { callToJSON } from './to_json.js'
 import { omitInvalidTypes } from './type.js'
-import { handleUncaughtException } from './uncaught.js'
+import { handleUnsafeException } from './uncaught.js'
 
 // Non-goals of this library:
 //  - Keeping or transtyping incompatible values
@@ -52,7 +52,7 @@ const transformValue = function ({
       maxSize,
     })
   } catch (error) {
-    return handleUncaughtException({ value, changes, path, error, size })
+    return handleUnsafeException({ value, changes, path, error, size })
   }
 }
 
