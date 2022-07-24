@@ -191,9 +191,9 @@ JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
 ### Infinite recursion
 
 ```js
-const input = { toJSON: () => ({ one: true, input: { ...input } }) }
+const input = { toJSON: () => ({ one: true, input }) }
 JSON.stringify(input) // Throws due to infinite `toJSON()` recursion
-JSON.stringify(safeJsonValue(input).value) // '{"one":true,"input":{}}"
+JSON.stringify(safeJsonValue(input).value) // '{"one":true,"input":{...}}"
 ```
 
 ### BigInt

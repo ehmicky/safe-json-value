@@ -3,7 +3,7 @@ import safeJsonValue from 'safe-json-value'
 import { each } from 'test-each'
 
 const isProp = function (key) {
-  return key === 'prop'
+  return key.startsWith('prop')
 }
 
 const getInfiniteGetter = () => ({
@@ -20,8 +20,18 @@ const getInfiniteToJSON = () => ({
   },
 })
 
+const getInfiniteToJSONTwo = () => ({
+  toJSON() {
+    return { prop: true, propTwo: getInfiniteToJSONTwo() }
+  },
+})
+
 each(
-  [{ getInput: getInfiniteGetter }, { getInput: getInfiniteToJSON }],
+  [
+    { getInput: getInfiniteGetter },
+    { getInput: getInfiniteToJSON },
+    { getInput: getInfiniteToJSONTwo },
+  ],
   ({ title }, { getInput }) => {
     test(`Handle dynamic infinite functions | ${title}`, (t) => {
       const input = getInput()

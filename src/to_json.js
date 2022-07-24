@@ -41,27 +41,27 @@ const hasToJSON = function (value) {
     isObject(value) &&
     'toJSON' in value &&
     typeof value.toJSON === 'function' &&
-    !(TO_JSON_RECURSION in value)
+    !TO_JSON_RECURSION.has(value)
   )
 }
 
 // We handle the common use case of an `object.toJSON()` calling this library
 // itself.
-//  - We do so by adding a symbol property to prevent infinite recursion
+//  - We do so by keeping track of prevent infinite recursion with a WeakSet
 //  - This only works if `this` (or an ancestor) is passed as argument to this
-//    library (inside `object.toJSON()`) without any operation which would
-//    remove that symbol
-const triggerToJSON = function (value) {
-  // eslint-disable-next-line fp/no-mutation, no-param-reassign
-  value[TO_JSON_RECURSION] = true
+//    library (inside `object.toJSON()`), as reference (not copy)
+//  - We do not set a symbol property instead, since this might change how
+//    user-defined `object.toJSON()` behaves
+const triggerToJSON = function (object) {
+  TO_JSON_RECURSION.add(object)
 
   try {
-    return value.toJSON()
+    return object.toJSON()
   } finally {
-    // eslint-disable-next-line fp/no-delete, no-param-reassign
-    delete value[TO_JSON_RECURSION]
+    TO_JSON_RECURSION.delete(object)
   }
 }
 
-// Enumerable so that object spreads keep it
-const TO_JSON_RECURSION = Symbol('toJsonRecursion')
+// Uses a WeakSet instead of a Set since this is a top-level variable and we
+// want to make sure there are no memory leaks.
+const TO_JSON_RECURSION = new WeakSet([])

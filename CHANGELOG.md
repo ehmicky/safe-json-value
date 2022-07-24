@@ -1,3 +1,9 @@
+# 1.4.2
+
+## Bug fixes
+
+- Better handle of infinite recursions
+
 # 1.4.1
 
 ## Bug fixes
