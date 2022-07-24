@@ -91,3 +91,23 @@ test('Handles dates', (t) => {
     { path: [], oldValue: input, newValue: dateString, reason: 'toJSON' },
   ])
 })
+
+test('Does not call object.toJSON() recursively', (t) => {
+  const newValue = { toJSON() {}, prop: true }
+  const input = {
+    toJSON() {
+      return newValue
+    },
+  }
+  const { value, changes } = safeJsonValue(input)
+  t.deepEqual(value, { prop: true })
+  t.deepEqual(changes, [
+    { path: [], oldValue: input, newValue, reason: 'toJSON' },
+    {
+      path: ['toJSON'],
+      oldValue: newValue.toJSON,
+      newValue: undefined,
+      reason: 'invalidType',
+    },
+  ])
+})
