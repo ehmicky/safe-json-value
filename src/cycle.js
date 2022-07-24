@@ -2,7 +2,7 @@ import { recurseArray } from './array.js'
 import { isObject } from './is_object.js'
 import { recurseObject } from './object.js'
 
-// Circular values are omitted
+// We omit cycles since `JSON.stringify()` throws on them.
 export const checkCycleThenRecurse = function ({
   value,
   changes,

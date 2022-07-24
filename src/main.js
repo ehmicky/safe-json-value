@@ -71,7 +71,6 @@ const transformValue = function ({
 //     - This favors maximizing the number of fields within the allowed
 //       `maxSize`
 //  - This is easier to implement
-// We omit cycles since `JSON.stringify()` throws on them.
 const checkSizeThenRecurse = function ({
   value,
   changes,
