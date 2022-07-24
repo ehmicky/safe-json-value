@@ -13,12 +13,63 @@ const transformProp = function (parent, key, changes, path) {
   // eslint-disable-next-line fp/no-mutating-methods
   path.push(key)
 
-  const prop = parent[key]
+  const prop = safeGetProp(parent, key, changes, path)
   const propA = transformValue(prop, changes, path)
 
   // eslint-disable-next-line fp/no-mutating-methods
   path.pop()
   return propA
+}
+
+// eslint-disable-next-line max-params
+const safeGetProp = function (parent, key, changes, path) {
+  try {
+    return getProp(parent, key, changes, path)
+  } catch (error) {
+    // eslint-disable-next-line fp/no-mutating-methods
+    changes.push({
+      path: [...path],
+      oldValue: undefined,
+      newValue: undefined,
+      reason: 'exception',
+      error,
+    })
+  }
+}
+
+// eslint-disable-next-line max-params
+const getProp = function (parent, key, changes, path) {
+  const prop = parent[key]
+  const descriptor = Object.getOwnPropertyDescriptor(parent, key)
+  addGetterChange(changes, path, prop, descriptor)
+  addDescriptorChange(changes, path, prop, descriptor)
+  return prop
+}
+
+// eslint-disable-next-line max-params
+const addGetterChange = function (changes, path, prop, descriptor) {
+  if ('get' in descriptor || 'set' in descriptor) {
+    // eslint-disable-next-line fp/no-mutating-methods
+    changes.push({
+      path: [...path],
+      oldValue: prop,
+      newValue: prop,
+      reason: 'getter',
+    })
+  }
+}
+
+// eslint-disable-next-line max-params
+const addDescriptorChange = function (changes, path, prop, descriptor) {
+  if (descriptor.writable === false || descriptor.configurable === false) {
+    // eslint-disable-next-line fp/no-mutating-methods
+    changes.push({
+      path: [...path],
+      oldValue: prop,
+      newValue: prop,
+      reason: 'descriptor',
+    })
+  }
 }
 
 const transformValue = function (value, changes, path) {
@@ -56,6 +107,3 @@ const transformObject = function (object, changes, path) {
 
   return objectA
 }
-
-const a = [{ a: { b: 1, c: 2 }, d: 3, e: 4 }, 5]
-console.log(safeJsonValue(a))
