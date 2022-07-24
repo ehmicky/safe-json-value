@@ -3,8 +3,12 @@
  */
 export interface Options {
   /**
-   * Maximum `JSON.stringify(value).length`.
+   * Big JSON strings can make a process, filesystem operation or network
+   * request crash.
+   * `maxSize` prevents it by setting a maximum `JSON.stringify(value).length`.
+   *
    * Additional properties beyond the size limit are omitted.
+   * They are completely removed, not truncated (including strings).
    *
    * @default Number.POSITIVE_INFINITY (no maximum size)
    *

@@ -77,8 +77,17 @@ Object with the following properties.
 _Type_: `number`\
 _Default_: `Number.POSITIVE_INFINITY` (no maximum size)
 
-Maximum `JSON.stringify(value).length`. Additional properties beyond the size
-limit [are omitted](#big-output).
+Big JSON strings can make a process, filesystem operation or network request
+crash. `maxSize` prevents it by setting a maximum
+`JSON.stringify(value).length`.
+
+Additional properties beyond the size limit [are omitted](#big-output). They are
+completely removed, not truncated (including strings).
+
+```js
+const input = { one: true, two: 'a'.repeat(1e6) }
+JSON.stringify(safeJsonValue(input, { maxSize: 1e5 }).value) // '{"one":true}"
+```
 
 ### Return value
 
@@ -134,7 +143,8 @@ _Type_: `string`
 Reason for the change among:
 
 - [Exceptions](#exceptions): [`"unsafeCycle"`](#cycles),
-  [`"unsafeException"`](#infinite-recursion), [`"unsafeBigInt"`](#bigint),
+  [`"unsafeBigInt"`](#bigint), [`"unsafeSize"`](#big-output),
+  [`"unsafeException"`](#infinite-recursion),
   [`"unsafeToJSON"`](#exceptions-in-tojson),
   [`"unsafeGetter"`](#exceptions-in-getters)
 - [Invalid descriptors](#invalid-descriptors):
@@ -149,7 +159,6 @@ Reason for the change among:
   [`"ignoredArrayProperty"`](#array-properties)
 - [Unresolved values](#unresolved-values): [`"unresolvedToJSON"`](#tojson),
   [`"unresolvedClass"`](#classes), [`"unresolvedGetter"`](#getters)
-- [Big output](#big-output): [`"unsafeSize"`](#big-output)
 
 ##### changes[*].error
 
@@ -192,6 +201,14 @@ JSON.stringify(safeJsonValue(input).value) // '{"one":true,"input":{}}"
 ```js
 const input = { one: true, two: 0n }
 JSON.stringify(input) // Throws due to BigInt
+JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
+```
+
+### Big output
+
+```js
+const input = { one: true, two: '\n'.repeat(5e8) }
+JSON.stringify(input) // Throws due to max string length
 JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
 ```
 
@@ -438,19 +455,6 @@ const input = new Proxy(
 )
 JSON.parse(JSON.stringify(input)) // { one: true }
 safeJsonValue(input).value // { one: true }
-```
-
-## Big output
-
-Big JSON strings can make a process, filesystem operation or network request
-crash.
-
-When using the [`maxSize` option](#maxsize), properties that are too large are
-omitted. Large values (including strings) are completely removed, not truncated.
-
-```js
-const input = { one: true, two: 'a'.repeat(1e6) }
-JSON.stringify(safeJsonValue(input, { maxSize: 1e5 }).value) // '{"one":true}"
 ```
 
 # Support
