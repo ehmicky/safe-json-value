@@ -6,11 +6,65 @@
 
 JSON serialization should never fail.
 
-Work in progress!
-
 # Features
 
-# Example
+Prevent `JSON.serialize()` from:
+
+- Throwing (due to cycles, unsupported types, etc.)
+- Returning an output so large your application will crash
+- Changing types unexpectedly (due to `toJSON()`, `NaN`, etc.)
+
+# Examples
+
+## Cycles
+
+<!-- eslint-disable fp/no-mutation -->
+
+```js
+import safeJsonValue from 'safe-json-value'
+
+const input = { one: true }
+input.self = input
+JSON.stringify(input) // Throws due to cycle
+JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
+```
+
+## Unsupported types
+
+```js
+const input = { one: true, two: 0n }
+JSON.stringify(input) // Throws due to BigInt
+JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
+```
+
+## Size limit
+
+```js
+const input = { one: true, two: 'a'.repeat(1e6) }
+JSON.stringify(safeJsonValue(input, { maxSize: 1e5 }).value) // '{"one":true}"
+```
+
+## Unexpected types
+
+```js
+const input = { one: true, two: Number.NaN }
+JSON.stringify(input) // '{"one":true,"two":null}"
+JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
+```
+
+## `toJSON()`
+
+<!-- eslint-disable no-unused-expressions -->
+
+```js
+const input = {
+  toJSON() {
+    return { one: true }
+  },
+}
+JSON.stringify(input) // '{"one":true}"
+safeJsonValue(input).value // { one: true }
+```
 
 # Install
 
