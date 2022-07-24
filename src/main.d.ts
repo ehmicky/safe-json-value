@@ -10,7 +10,7 @@ export interface Options {
    * Additional properties beyond the size limit are omitted.
    * They are completely removed, not truncated (including strings).
    *
-   * @default Number.POSITIVE_INFINITY (no maximum size)
+   * @default 1e7
    *
    * @example
    * ```js

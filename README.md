@@ -75,7 +75,7 @@ Object with the following properties.
 #### maxSize
 
 _Type_: `number`\
-_Default_: `Number.POSITIVE_INFINITY` (no maximum size)
+_Default_: `1e7`
 
 Big JSON strings can make a process, filesystem operation or network request
 crash. `maxSize` prevents it by setting a maximum

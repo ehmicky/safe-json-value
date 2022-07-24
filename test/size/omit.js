@@ -2,15 +2,6 @@ import test from 'ava'
 import safeJsonValue from 'safe-json-value'
 import { each } from 'test-each'
 
-each(
-  [undefined, { maxSize: undefined }, { maxSize: Number.POSITIVE_INFINITY }],
-  ({ title }, options) => {
-    test(`Does not apply options.maxSize by default | ${title}`, (t) => {
-      t.deepEqual(safeJsonValue({}, options), { value: {}, changes: [] })
-    })
-  },
-)
-
 const symbol = Symbol('test')
 each(
   [

@@ -54,8 +54,10 @@ export const addSize = function ({
 
 // Skip checking for size when `maxSize` option equals this value
 const SKIP_MAX_SIZE = Number.POSITIVE_INFINITY
-// Default value for `maxSize` option
-export const DEFAULT_MAX_SIZE = SKIP_MAX_SIZE
+
+// Default value for `maxSize` option.
+// Chosen based on v8 max string length, which is ~5e8.
+export const DEFAULT_MAX_SIZE = 1e7
 
 const SIZED_TYPES = {
   value: {
