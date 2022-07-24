@@ -9,13 +9,19 @@ import isPlainObj from 'is-plain-obj'
 //  - Supporting other formats than JSON
 export default function safeJsonValue(
   value,
-  // eslint-disable-next-line no-unused-vars
   { maxSize = Number.POSITIVE_INFINITY } = {},
 ) {
   const changes = []
   const ancestors = new Set([])
-  const valueA = transformValue({ value, changes, ancestors, path: [] })
-  return { value: valueA, changes }
+  const { value: valueA, size } = transformValue({
+    value,
+    changes,
+    ancestors,
+    path: [],
+    size: 0,
+    maxSize,
+  })
+  return { value: valueA, changes, size }
 }
 
 // The final top-level return value:
@@ -26,15 +32,28 @@ export default function safeJsonValue(
 //     - Further processing on the value before serialization
 //     - Delaying the serialization
 //        - e.g. when `process.send()` is used with Node.js
-const transformValue = function ({ value, changes, ancestors, path }) {
+const transformValue = function ({
+  value,
+  changes,
+  ancestors,
+  path,
+  size,
+  maxSize,
+}) {
   try {
     const valueA = callToJSON(value, changes, path)
     const valueB = filterValue(valueA, changes, path)
     addNotArrayIndexChanges(valueB, changes, path)
-    const valueC = safeRecurseValue({ value: valueB, changes, ancestors, path })
-    return valueC
+    return safeRecurseValue({
+      value: valueB,
+      changes,
+      ancestors,
+      path,
+      size,
+      maxSize,
+    })
   } catch (error) {
-    handleUncaughtException({ value, changes, path, error })
+    return handleUncaughtException({ value, changes, path, error, size })
   }
 }
 
@@ -142,7 +161,7 @@ const addNotArrayIndexChanges = function (array, changes, path) {
     if (!arrayProps.has(key)) {
       changes.push({
         path: [...path, key],
-        oldValue: safeGetArrayProp(array, key),
+        oldValue: safeGetChangeProp(array, key),
         newValue: undefined,
         reason: 'notArrayIndex',
       })
@@ -163,10 +182,10 @@ const getArrayIndex = function (_, index) {
   return String(index)
 }
 
-// If the array property is a getter or Proxy hook, it might throw.
-const safeGetArrayProp = function (array, key) {
+// If the object|array property is a getter or Proxy hook, it might throw.
+const safeGetChangeProp = function (objectOrArray, key) {
   try {
-    return array[key]
+    return objectOrArray[key]
   } catch {}
 }
 
@@ -182,9 +201,29 @@ const safeGetArrayProp = function (array, key) {
 //       `maxSize`
 //  - This is easier to implement
 // We omit cycles since `JSON.stringify()` throws on them.
-const safeRecurseValue = function ({ value, changes, ancestors, path }) {
+const safeRecurseValue = function ({
+  value,
+  changes,
+  ancestors,
+  path,
+  size,
+  maxSize,
+}) {
+  const { size: sizeA, stop } = addSize({
+    type: 'value',
+    size,
+    maxSize,
+    changes,
+    path,
+    context: value,
+  })
+
+  if (stop) {
+    return { value: undefined, size: sizeA }
+  }
+
   if (!isObject(value)) {
-    return value
+    return { value, size: sizeA }
   }
 
   if (ancestors.has(value)) {
@@ -194,19 +233,33 @@ const safeRecurseValue = function ({ value, changes, ancestors, path }) {
       newValue: undefined,
       reason: 'cycle',
     })
-    return
+    return { value: undefined, size }
   }
 
   ancestors.add(value)
-  const valueA = recurseValue({ value, changes, ancestors, path })
+  const { value: valueA, size: sizeB } = recurseValue({
+    value,
+    changes,
+    ancestors,
+    path,
+    size: sizeA,
+    maxSize,
+  })
   ancestors.delete(value)
-  return valueA
+  return { value: valueA, size: sizeB }
 }
 
-const recurseValue = function ({ value, changes, ancestors, path }) {
+const recurseValue = function ({
+  value,
+  changes,
+  ancestors,
+  path,
+  size,
+  maxSize,
+}) {
   return Array.isArray(value)
-    ? recurseArray({ array: value, changes, ancestors, path })
-    : recurseObject({ object: value, changes, ancestors, path })
+    ? recurseArray({ array: value, changes, ancestors, path, size, maxSize })
+    : recurseObject({ object: value, changes, ancestors, path, size, maxSize })
 }
 
 const isObject = function (value) {
@@ -219,27 +272,57 @@ const isObject = function (value) {
 //    behavior
 // Omitted items are filtered out.
 //  - Otherwise, `JSON.stringify()` would transform them to `null`
-const recurseArray = function ({ array, changes, ancestors, path }) {
+const recurseArray = function ({
+  array,
+  changes,
+  ancestors,
+  path,
+  size,
+  maxSize,
+}) {
   const newArray = []
+  let emptyArray = true
+  let sizeA = size
 
   // eslint-disable-next-line fp/no-loops, fp/no-mutation, fp/no-let
   for (let index = 0; index < array.length; index += 1) {
-    const item = transformProp({
+    const itemPath = [...path, index]
+    const { size: sizeB, stop } = addSize({
+      type: 'arrayItem',
+      size: sizeA,
+      maxSize,
+      changes,
+      path: itemPath,
+      context: { emptyArray, array, index },
+    })
+
+    if (stop) {
+      break
+    }
+
+    const { value: item, size: sizeC } = transformProp({
       parent: array,
       key: index,
       changes,
       ancestors,
-      path,
+      path: itemPath,
+      size: sizeB,
+      maxSize,
     })
 
     // eslint-disable-next-line max-depth
     if (item !== undefined) {
+      if (emptyArray) {
+        emptyArray = false
+      }
+
+      sizeA = sizeC
       // eslint-disable-next-line fp/no-mutating-methods
       newArray.push(item)
     }
   }
 
-  return newArray
+  return { value: newArray, size: sizeA }
 }
 
 // Recurse over object properties.
@@ -248,28 +331,58 @@ const recurseArray = function ({ array, changes, ancestors, path }) {
 // We iterate in `Reflect.ownKeys()` order, not in sorted keys order.
 //  - This is faster
 //  - This preserves the object properties order
-const recurseObject = function ({ object, changes, ancestors, path }) {
+const recurseObject = function ({
+  object,
+  changes,
+  ancestors,
+  path,
+  size,
+  maxSize,
+}) {
   const newObject = getNewObject(object)
+  let emptyObject = true
+  let sizeA = size
 
   // eslint-disable-next-line fp/no-loops
   for (const key of Reflect.ownKeys(object)) {
-    const prop = transformProp({
+    const propPath = [...path, key]
+    const { size: sizeB, stop } = addSize({
+      type: 'objectProp',
+      size: sizeA,
+      maxSize,
+      changes,
+      path: propPath,
+      context: { emptyObject, object, key },
+    })
+
+    if (stop) {
+      continue
+    }
+
+    const { value: prop, size: sizeC } = transformProp({
       parent: object,
       key,
       changes,
       ancestors,
-      path,
+      path: propPath,
+      size: sizeB,
+      maxSize,
     })
 
     // eslint-disable-next-line max-depth
     if (prop !== undefined) {
+      if (emptyObject) {
+        emptyObject = false
+      }
+
+      sizeA = sizeC
       // eslint-disable-next-line fp/no-mutation
       newObject[key] = prop
     }
   }
 
   addClassChange({ object, newObject, changes, path })
-  return newObject
+  return { value: newObject, size: sizeA }
 }
 
 // When the object has a `null` prototype, we keep it.
@@ -294,17 +407,25 @@ const addClassChange = function ({ object, newObject, changes, path }) {
 }
 
 // Recurse over an object property or array index
-const transformProp = function ({ parent, key, changes, ancestors, path }) {
-  const pathA = [...path, key]
-  const prop = safeGetProp({ parent, key, changes, path: pathA })
-  const propA = filterKey({ parent, key, prop, changes, path: pathA })
-  const propB = transformValue({
+const transformProp = function ({
+  parent,
+  key,
+  changes,
+  ancestors,
+  path,
+  size,
+  maxSize,
+}) {
+  const prop = safeGetProp({ parent, key, changes, path })
+  const propA = filterKey({ parent, key, prop, changes, path })
+  return transformValue({
     value: propA,
     changes,
     ancestors,
-    path: pathA,
+    path,
+    size,
+    maxSize,
   })
-  return propB
 }
 
 // `parent[key]` might be a getter or proxy hook. This resolves it.
@@ -415,7 +536,13 @@ const { propertyIsEnumerable: isEnum } = Object.prototype
 //  - When a `get` method or Proxy hook (not `object.toJSON()`)
 //  - Calls this library itself
 //  - Passing a reference (not a copy) to itself or to an ancestor
-const handleUncaughtException = function ({ value, changes, path, error }) {
+const handleUncaughtException = function ({
+  value,
+  changes,
+  path,
+  error,
+  size,
+}) {
   changes.push({
     path,
     oldValue: value,
@@ -423,4 +550,62 @@ const handleUncaughtException = function ({ value, changes, path, error }) {
     reason: 'uncaughtException',
     error,
   })
+  return { value: undefined, size }
+}
+
+const addSize = function ({ type, size, maxSize, changes, path, context }) {
+  if (maxSize === Number.POSITIVE_INFINITY) {
+    return { size, stop: false }
+  }
+
+  const { getSize, getOldValue } = SIZED_TYPES[type]
+  const newSize = size + getSize(context)
+  const stop = newSize > maxSize
+
+  if (!stop) {
+    return { size: newSize, stop }
+  }
+
+  changes.push({
+    path,
+    oldValue: getOldValue(context),
+    newValue: undefined,
+    reason: 'maxSize',
+  })
+  return { size, stop }
+}
+
+const SIZED_TYPES = {
+  value: {
+    getSize(value) {
+      if (value === undefined) {
+        return 0
+      }
+
+      return typeof value === 'object' && value !== null
+        ? 2
+        : JSON.stringify(value).length
+    },
+    getOldValue(value) {
+      return value
+    },
+  },
+  arrayItem: {
+    getSize({ emptyArray }) {
+      return emptyArray ? 0 : 1
+    },
+    getOldValue({ array, index }) {
+      return safeGetChangeProp(array, index)
+    },
+  },
+  objectProp: {
+    getSize({ key, emptyObject }) {
+      return typeof key === 'symbol'
+        ? 0
+        : JSON.stringify(key).length + (emptyObject ? 1 : 2)
+    },
+    getOldValue({ object, key }) {
+      return safeGetChangeProp(object, key)
+    },
+  },
 }
