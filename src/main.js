@@ -407,6 +407,7 @@ const { propertyIsEnumerable: isEnum } = Object.prototype
 //  - That contains properties with dynamic functions themselves
 // It is not possible to detect whether the recursion will be infinite or not,
 // except by catching any exception due to a stack overflow.
+//  - The property is omitted then
 // One downside is that it also catches any bug in this library.
 //  - However the guarantee that this library never throws is more important.
 // Note: there is still one edge case which might crash the process (with
