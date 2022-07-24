@@ -8,3 +8,29 @@ test('Keep null prototypes', (t) => {
   // eslint-disable-next-line unicorn/no-null
   t.is(Object.getPrototypeOf(value), null)
 })
+
+test('Omit removed properties', (t) => {
+  const { value, changes } = safeJsonValue({ prop: undefined })
+  t.deepEqual(value, {})
+  t.deepEqual(changes, [
+    {
+      path: ['prop'],
+      oldValue: undefined,
+      newValue: undefined,
+      reason: 'invalidType',
+    },
+  ])
+  t.false('prop' in value)
+})
+
+test('Convert any objects to plain objects', (t) => {
+  const set = new Set([])
+  // eslint-disable-next-line fp/no-mutation
+  set.prop = true
+  t.deepEqual(safeJsonValue(set), {
+    value: { prop: true },
+    changes: [
+      { path: [], oldValue: set, newValue: { prop: true }, reason: 'class' },
+    ],
+  })
+})
