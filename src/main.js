@@ -13,7 +13,8 @@ export default function safeJsonValue(
   { maxSize = Number.POSITIVE_INFINITY } = {},
 ) {
   const changes = []
-  const valueA = transformValue(value, changes, [])
+  const ancestors = new Set([])
+  const valueA = transformValue({ value, changes, ancestors, path: [] })
   return { value: valueA, changes }
 }
 
@@ -25,11 +26,11 @@ export default function safeJsonValue(
 //     - Further processing on the value before serialization
 //     - Delaying the serialization
 //        - e.g. when `process.send()` is used with Node.js
-const transformValue = function (value, changes, path) {
+const transformValue = function ({ value, changes, ancestors, path }) {
   const valueA = callToJSON(value, changes, path)
   const valueB = filterValue(valueA, changes, path)
   addNotArrayIndexChanges(valueB, changes, path)
-  const valueC = recurseValue(valueB, changes, path)
+  const valueC = recurseValue({ value: valueB, changes, ancestors, path })
   return valueC
 }
 
@@ -152,14 +153,29 @@ const safeGetArrayProp = function (array, key) {
 //     - This favors maximizing the number of fields within the allowed
 //       `maxSize`
 //  - This is easier to implement
-const recurseValue = function (value, changes, path) {
+const recurseValue = function ({ value, changes, ancestors, path }) {
   if (!isObject(value)) {
     return value
   }
 
-  return Array.isArray(value)
-    ? recurseArray(value, changes, path)
-    : recurseObject(value, changes, path)
+  if (ancestors.has(value)) {
+    changes.push({
+      path,
+      oldValue: value,
+      newValue: undefined,
+      reason: 'cycle',
+    })
+    return
+  }
+
+  ancestors.add(value)
+
+  const valueA = Array.isArray(value)
+    ? recurseArray({ array: value, changes, ancestors, path })
+    : recurseObject({ object: value, changes, ancestors, path })
+
+  ancestors.delete(value)
+  return valueA
 }
 
 const isObject = function (value) {
@@ -172,12 +188,18 @@ const isObject = function (value) {
 //    behavior
 // Omitted items are filtered out.
 //  - Otherwise, `JSON.stringify()` would transform them to `null`
-const recurseArray = function (array, changes, path) {
+const recurseArray = function ({ array, changes, ancestors, path }) {
   const newArray = []
 
   // eslint-disable-next-line fp/no-loops, fp/no-mutation, fp/no-let
   for (let index = 0; index < array.length; index += 1) {
-    const item = transformProp({ parent: array, key: index, changes, path })
+    const item = transformProp({
+      parent: array,
+      key: index,
+      changes,
+      ancestors,
+      path,
+    })
 
     // eslint-disable-next-line max-depth
     if (item !== undefined) {
@@ -195,12 +217,18 @@ const recurseArray = function (array, changes, path) {
 // We iterate in `Reflect.ownKeys()` order, not in sorted keys order.
 //  - This is faster
 //  - This preserves the object properties order
-const recurseObject = function (object, changes, path) {
+const recurseObject = function ({ object, changes, ancestors, path }) {
   const newObject = getNewObject(object)
 
   // eslint-disable-next-line fp/no-loops
   for (const key of Reflect.ownKeys(object)) {
-    const prop = transformProp({ parent: object, key, changes, path })
+    const prop = transformProp({
+      parent: object,
+      key,
+      changes,
+      ancestors,
+      path,
+    })
 
     // eslint-disable-next-line max-depth
     if (prop !== undefined) {
@@ -235,11 +263,16 @@ const addClassChange = function ({ object, newObject, changes, path }) {
 }
 
 // Recurse over an object property or array index
-const transformProp = function ({ parent, key, changes, path }) {
+const transformProp = function ({ parent, key, changes, ancestors, path }) {
   const pathA = [...path, key]
   const prop = safeGetProp({ parent, key, changes, path: pathA })
   const propA = filterKey({ parent, key, prop, changes, path: pathA })
-  const propB = transformValue(propA, changes, pathA)
+  const propB = transformValue({
+    value: propA,
+    changes,
+    ancestors,
+    path: pathA,
+  })
   return propB
 }
 
