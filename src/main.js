@@ -40,10 +40,15 @@ const safeGetProp = function (parent, key, changes, path) {
 // eslint-disable-next-line max-params
 const getProp = function (parent, key, changes, path) {
   const prop = parent[key]
+  addGetPropChanges(parent, key, changes, path, prop)
+  return prop
+}
+
+// eslint-disable-next-line max-params
+const addGetPropChanges = function (parent, key, changes, path, prop) {
   const descriptor = Object.getOwnPropertyDescriptor(parent, key)
   addGetterChange(changes, path, prop, descriptor)
   addDescriptorChange(changes, path, prop, descriptor)
-  return prop
 }
 
 // eslint-disable-next-line max-params
@@ -60,8 +65,13 @@ const addGetterChange = function (changes, path, prop, descriptor) {
 }
 
 // eslint-disable-next-line max-params
-const addDescriptorChange = function (changes, path, prop, descriptor) {
-  if (descriptor.writable === false || descriptor.configurable === false) {
+const addDescriptorChange = function (
+  changes,
+  path,
+  prop,
+  { writable, configurable },
+) {
+  if (writable === false || configurable === false) {
     // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path: [...path],
