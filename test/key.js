@@ -8,15 +8,48 @@ each(
     {
       input: { [symbol]: true },
       output: {},
-      change: { path: [symbol], reason: 'symbolKey' },
+      changes: [
+        {
+          path: [symbol],
+          oldValue: true,
+          newValue: undefined,
+          reason: 'symbolKey',
+        },
+      ],
+    },
+    {
+      // eslint-disable-next-line fp/no-mutating-methods
+      input: Object.defineProperty({}, 'prop', {
+        value: true,
+        enumerable: false,
+        writable: true,
+        configurable: true,
+      }),
+      output: {},
+      changes: [
+        {
+          path: ['prop'],
+          oldValue: true,
+          newValue: undefined,
+          reason: 'notEnumerable',
+        },
+      ],
+    },
+    {
+      // eslint-disable-next-line fp/no-mutating-methods
+      input: Object.defineProperty([], '0', {
+        value: true,
+        enumerable: false,
+        writable: true,
+        configurable: true,
+      }),
+      output: [true],
+      changes: [],
     },
   ],
-  ({ title }, { input, output, change }) => {
+  ({ title }, { input, output, changes }) => {
     test(`Omit invalid keys | ${title}`, (t) => {
-      t.deepEqual(safeJsonValue(input), {
-        value: output,
-        changes: [{ ...change, oldValue: true, newValue: undefined }],
-      })
+      t.deepEqual(safeJsonValue(input), { value: output, changes })
     })
   },
 )
