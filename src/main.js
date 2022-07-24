@@ -13,7 +13,7 @@ export default function safeJsonValue(
 ) {
   const changes = []
   const ancestors = new Set([])
-  const { value: valueA, size } = transformValue({
+  const { value: newValue } = transformValue({
     value,
     changes,
     ancestors,
@@ -21,7 +21,7 @@ export default function safeJsonValue(
     size: 0,
     maxSize,
   })
-  return { value: valueA, changes, size }
+  return { value: newValue, changes }
 }
 
 // The final top-level return value:
