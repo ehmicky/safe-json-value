@@ -37,18 +37,15 @@ const safeGetProp = function (parent, key, changes, path) {
   }
 }
 
+// The descriptor is retrieved first in case there is a getter or proxy hook
+// that modifies `parent[key]`
 // eslint-disable-next-line max-params
 const getProp = function (parent, key, changes, path) {
-  const prop = parent[key]
-  addGetPropChanges(parent, key, changes, path, prop)
-  return prop
-}
-
-// eslint-disable-next-line max-params
-const addGetPropChanges = function (parent, key, changes, path, prop) {
   const descriptor = Object.getOwnPropertyDescriptor(parent, key)
+  const prop = parent[key]
   addGetterChange(changes, path, prop, descriptor)
   addDescriptorChange(changes, path, prop, descriptor)
+  return prop
 }
 
 // eslint-disable-next-line max-params
