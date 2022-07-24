@@ -11,6 +11,21 @@ each(
   },
 )
 
+const strings = [
+  'test',
+  '',
+  // Backslash sequences
+  '\n',
+  '\0',
+  // UTF-8 character
+  '𝌆',
+  // Valid UTF-8 sequences
+  '\uD834\uDF06',
+  // Invalid UTF-8 sequences
+  '\uDF06\uD834',
+  '\uDEAD',
+]
+
 each(
   [
     {},
@@ -28,14 +43,7 @@ each(
     1e60,
     // eslint-disable-next-line no-magic-numbers
     1e-60,
-    '',
-    'test',
-    '\n',
-    '\0',
-    '𝌆',
-    '\uD834\uDF06',
-    '\uDF06\uD834',
-    '\uDEAD',
+    ...strings,
   ],
   ({ title }, input) => {
     test(`Applies options.maxSize on values | ${title}`, (t) => {
@@ -54,7 +62,7 @@ each(
   },
 )
 
-each(['prop'], ({ title }, key) => {
+each([...strings], ({ title }, key) => {
   test(`Applies options.maxSize on properties | ${title}`, (t) => {
     const input = { one: true, [key]: true }
     const size = JSON.stringify(input).length
@@ -65,12 +73,7 @@ each(['prop'], ({ title }, key) => {
     t.deepEqual(safeJsonValue(input, { maxSize: size - 1 }), {
       value: { one: true },
       changes: [
-        {
-          path: ['prop'],
-          oldValue: true,
-          newValue: undefined,
-          reason: 'maxSize',
-        },
+        { path: [key], oldValue: true, newValue: undefined, reason: 'maxSize' },
       ],
     })
   })
