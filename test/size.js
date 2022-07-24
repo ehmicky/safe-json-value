@@ -84,22 +84,30 @@ const error = new Error('test')
 each(
   [
     {
-      input: { prop: undefined },
+      input: { two: undefined },
       output: {},
-      key: 'prop',
+      key: 'two',
       change: { reason: 'invalidType' },
     },
     {
       input: { one: true, two: undefined },
       output: { one: true },
       key: 'two',
-      sizeIncrement: JSON.stringify('two').length + ','.length + ':'.length - 1,
+      sizeIncrement: ','.length + JSON.stringify('two').length + ':'.length - 1,
       change: { reason: 'invalidType' },
+    },
+    {
+      input: [undefined],
+      output: [],
+      key: 0,
+      change: { reason: 'invalidType' },
+      sizeChange: { reason: 'invalidType' },
     },
     {
       input: [1, undefined],
       output: [1],
       key: 1,
+      sizeIncrement: ','.length - 1,
       change: { reason: 'invalidType' },
     },
     {
@@ -117,12 +125,15 @@ each(
       title: 'unsafeObjectProp',
     },
   ],
-  ({ title }, { input, output, key, sizeIncrement = 0, change }) => {
+  (
+    { title },
+    { input, output, key, sizeIncrement = 0, change, sizeChange = {} },
+  ) => {
     test(`Does not recurse if object property key, property comma or array comma is over options.maxSize | ${title}`, (t) => {
       t.deepEqual(safeJsonValue(input), {
         value: output,
         changes: [
-          { ...change, path: [key], oldValue: undefined, newValue: undefined },
+          { path: [key], oldValue: undefined, newValue: undefined, ...change },
         ],
       })
       const maxSize = JSON.stringify(output).length + sizeIncrement
@@ -134,6 +145,7 @@ each(
             oldValue: undefined,
             newValue: undefined,
             reason: 'maxSize',
+            ...sizeChange,
           },
         ],
       })
