@@ -1,3 +1,9 @@
+# 1.3.0
+
+## Documentation
+
+- Add npm keywords
+
 # 1.2.0
 
 ## Features
