@@ -1,8 +1,7 @@
 import test from 'ava'
 import safeJsonValue from 'safe-json-value'
-import { each } from 'test-each'
 
-test('Call object.toJSON()', (t) => {
+test('Calls object.toJSON()', (t) => {
   const input = {
     toJSON() {
       return true
@@ -35,7 +34,7 @@ test('Handles object.toJSON() returning undefined', (t) => {
   ])
 })
 
-test('Handles object.toJSON() that throw', (t) => {
+test('Handles object.toJSON() that throws', (t) => {
   const error = new Error('test')
   const input = {
     toJSON() {
@@ -61,44 +60,6 @@ test('Handles object.toJSON() that throw', (t) => {
   ])
 })
 
-each(
-  [
-    function toJSON() {
-      // eslint-disable-next-line fp/no-this, no-invalid-this
-      return safeJsonValue(this).value
-    },
-    function toJSON() {
-      // eslint-disable-next-line fp/no-this, no-invalid-this
-      return safeJsonValue({ ...this }).value
-    },
-  ],
-  ({ title }, toJSON) => {
-    test(`Handles object.toJSON() that calls the library itself | ${title}`, (t) => {
-      const input = { one: true, two: undefined, toJSON }
-      const value = input.toJSON()
-      t.false('two' in value)
-      t.false('toJSON' in value)
-      t.deepEqual(value, { one: true })
-    })
-  },
-)
-
-test('Handles object.toJSON() that call the library itself with a parent', (t) => {
-  const input = {
-    prop: {
-      one: true,
-      two: undefined,
-      toJSON() {
-        return safeJsonValue(input).value
-      },
-    },
-  }
-  const value = input.prop.toJSON()
-  t.false('two' in value.prop)
-  t.false('toJSON' in value.prop)
-  t.deepEqual(value, { prop: { prop: { one: true } } })
-})
-
 test('Handles object.toJSON that are not functions', (t) => {
   const input = { toJSON: true }
   const { value, changes } = safeJsonValue(input)
@@ -118,11 +79,7 @@ test('Handles dates', (t) => {
 
 test('Does not call object.toJSON() recursively', (t) => {
   const newValue = { toJSON() {}, prop: true }
-  const input = {
-    toJSON() {
-      return newValue
-    },
-  }
+  const input = { toJSON: () => newValue }
   const { value, changes } = safeJsonValue(input)
   t.deepEqual(value, { prop: true })
   t.deepEqual(changes, [
