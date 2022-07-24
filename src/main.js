@@ -425,12 +425,9 @@ const recurseProp = function ({
     size: sizeA,
     maxSize,
   })
-
-  if (value === undefined) {
-    return { empty, size }
-  }
-
-  return { empty: false, size: sizeB, value }
+  return value === undefined
+    ? { empty, size }
+    : { empty: false, size: sizeB, value }
 }
 
 // Recurse over an object property or array index
