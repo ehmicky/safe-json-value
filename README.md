@@ -11,9 +11,9 @@ JSON serialization should never fail.
 Prevent `JSON.serialize()` from:
 
 - [Throwing](#exceptions)
-- Returning an [output too large](#large-output)
-- Changing [types](#unexpected-types) or [values](#unexpected-values)
+- Changing [types](#unexpected-types) or [values](#unresolved-values)
   unexpectedly
+- Returning a [very big output](#big-output)
 
 # Example
 
@@ -44,34 +44,84 @@ not `require()`.
 
 `value` `any`\
 `options` [`Options?`](#options)\
-_Return value_: `object`
+_Return value_: [`object`](#return-value)
+
+Makes `value` [JSON-safe](#changes-1) by:
+
+- Omitting properties which would [throw](#exceptions) or
+  [change type](#unexpected-types) unexpectedly with `JSON.stringify()`
+- Resolving properties which would [change values](#unresolved-values) with
+  `JSON.stringify()`
 
 This never throws.
 
 ### Options
 
-#### `maxSize`
+Object with the following properties.
+
+#### maxSize
 
 _Type_: `number`\
 _Default_: `Number.POSITIVE_INFINITY`
 
+Maximum `JSON.stringify(value).length`. Additional properties beyond the size
+limit are omitted.
+
+Disabled when `Number.POSITIVE_INFINITY`.
+
 ### Return value
 
-The return value is an object with the following properties.
+Object with the following properties.
 
-#### `value`
+#### value
 
 _Type_: `any`
 
-Same as input `value` but JSON-safe.
+Copy of input `value` with [changes](#changes-1) applied to make it JSON-safe.
 
-#### `changes`
+#### changes
 
 _Type_: `Change[]`
 
+List of [changes](#changes-1) applied to [`value`](#value). Each item is an
+individual change to a specific property.
+
+##### changes[*].path
+
+_Type_: `Array<string | symbol | number>`
+
+Property path.
+
+It can be manipulated or stringified using
+[`wild-wild-parser`](https://github.com/ehmicky/wild-wild-parser/#serializepathpatharray).
+
+##### changes[*].oldValue
+
+_Type_: `any`
+
+Property value before the change.
+
+##### changes[*].newValue
+
+_Type_: `any`
+
+Property value after the change. `undefined` if the property was omitted.
+
+##### changes[*].reason
+
+_Type_: `string`
+
+Reason for the change among:
+
+- [`"cycle"`](#cycles)
+
 # Changes
 
+This is a list of all possible changes applied to make the value JSON-safe.
+
 ## Exceptions
+
+`JSON.stringify()` can throw on specific properties. Those are omitted.
 
 ### Cycles
 
@@ -92,14 +142,10 @@ JSON.stringify(input) // Throws due to BigInt
 JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
 ```
 
-## Large output
-
-```js
-const input = { one: true, two: 'a'.repeat(1e6) }
-JSON.stringify(safeJsonValue(input, { maxSize: 1e5 }).value) // '{"one":true}"
-```
-
 ## Unexpected types
+
+`JSON.stringify()` changes the types of specific values unexpectedly. Those are
+omitted.
 
 ### NaN
 
@@ -109,7 +155,10 @@ JSON.stringify(input) // '{"one":true,"two":null}"
 JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
 ```
 
-## Unexpected values
+## Unresolved values
+
+`JSON.stringify()` can transform some values. Those are resolved right away to
+prevent any unexpected output.
 
 ### `toJSON()`
 
@@ -123,6 +172,17 @@ const input = {
 }
 JSON.stringify(input) // '{"one":true}"
 safeJsonValue(input).value // { one: true }
+```
+
+## Big output
+
+Big JSON strings can make a process, filesystem operation or network request
+crash. When using the [`maxSize` option](#maxsize), properties that are too
+large are omitted.
+
+```js
+const input = { one: true, two: 'a'.repeat(1e6) }
+JSON.stringify(safeJsonValue(input, { maxSize: 1e5 }).value) // '{"one":true}"
 ```
 
 # Support
