@@ -153,6 +153,7 @@ each(
   },
 )
 
+const symbol = Symbol('test')
 each(
   [
     {
@@ -161,19 +162,20 @@ each(
       key: 'one',
     },
     { input: [undefined, true], output: [true], key: 0 },
+    {
+      input: { [symbol]: undefined, prop: true },
+      output: { prop: true },
+      key: symbol,
+      reason: 'symbolKey',
+    },
   ],
-  ({ title }, { input, output, key }) => {
+  ({ title }, { input, output, key, reason = 'invalidType' }) => {
     test(`Omitted values do not count towards options.maxSize | ${title}`, (t) => {
       const maxSize = JSON.stringify(output).length
       t.deepEqual(safeJsonValue(input, { maxSize }), {
         value: output,
         changes: [
-          {
-            path: [key],
-            oldValue: undefined,
-            newValue: undefined,
-            reason: 'invalidType',
-          },
+          { path: [key], oldValue: undefined, newValue: undefined, reason },
         ],
       })
     })
