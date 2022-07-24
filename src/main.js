@@ -305,13 +305,13 @@ const recurseArray = function ({
   for (let index = 0; index < array.length; index += 1) {
     // eslint-disable-next-line fp/no-mutation
     state = recurseArrayItem({
-      path,
-      index,
-      maxSize,
-      changes,
       array,
+      changes,
       ancestors,
+      path,
+      maxSize,
       newArray,
+      index,
       state,
     })
   }
@@ -320,13 +320,13 @@ const recurseArray = function ({
 }
 
 const recurseArrayItem = function ({
-  path,
-  index,
-  maxSize,
-  changes,
   array,
+  changes,
   ancestors,
+  path,
+  maxSize,
   newArray,
+  index,
   state,
   state: { emptyArray, size },
 }) {
@@ -385,13 +385,13 @@ const recurseObject = function ({
   for (const key of Reflect.ownKeys(object)) {
     // eslint-disable-next-line fp/no-mutation
     state = recurseObjectProp({
-      path,
-      key,
-      maxSize,
-      changes,
       object,
+      changes,
       ancestors,
+      path,
+      maxSize,
       newObject,
+      key,
       state,
     })
   }
@@ -422,13 +422,13 @@ const addClassChange = function ({ object, newObject, changes, path }) {
 }
 
 const recurseObjectProp = function ({
-  path,
-  key,
-  maxSize,
-  changes,
   object,
+  changes,
   ancestors,
+  path,
+  maxSize,
   newObject,
+  key,
   state,
   state: { emptyObject, size },
 }) {
