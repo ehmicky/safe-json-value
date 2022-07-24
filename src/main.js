@@ -120,6 +120,8 @@ const filterKey = function (parent, key, prop, changes, path) {
   return prop
 }
 
+const { propertyIsEnumerable: isEnum } = Object.prototype
+
 const transformValue = function (value, changes, path) {
   const valueA = callToJSON(value, changes, path)
   const valueB = filterValue(valueA, changes, path)
@@ -260,8 +262,6 @@ const recurseObject = function (object, changes, path) {
   addClassChange(object, objectA, changes, path)
   return objectA
 }
-
-const { propertyIsEnumerable: isEnum } = Object.prototype
 
 // eslint-disable-next-line max-params
 const addClassChange = function (object, objectA, changes, path) {
