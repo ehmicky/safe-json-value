@@ -1,3 +1,5 @@
+import normalizeException from 'normalize-exception'
+
 import { isObject } from './is_object.js'
 
 // Replace `object.toJSON()` by its return value.
@@ -29,7 +31,7 @@ export const callToJSON = function (value, changes, path) {
       oldValue: value,
       newValue: undefined,
       reason: 'unsafeToJSON',
-      error,
+      error: normalizeException(error),
     })
   }
 }

@@ -30,7 +30,7 @@ test('Omit proxy get hooks that throw', (t) => {
     { prop: true },
     {
       get() {
-        throw error
+        throw error.message
       },
     },
   )

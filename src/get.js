@@ -1,3 +1,5 @@
+import normalizeException from 'normalize-exception'
+
 // Same as `safeGetProp()` but without any `changes`
 export const safeGetChangeProp = function ({ parent, key }) {
   try {
@@ -19,7 +21,7 @@ export const safeGetProp = function ({ parent, key, changes, path }) {
       oldValue: undefined,
       newValue: undefined,
       reason: 'unsafeGetter',
-      error,
+      error: normalizeException(error),
     })
     return { prop: undefined, safe: false }
   }

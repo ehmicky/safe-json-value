@@ -1,3 +1,9 @@
+# 1.3.0
+
+## Features
+
+- Ensure `changes[*].error` are always `Error` instances
+
 # 1.2.1
 
 ## Documentation

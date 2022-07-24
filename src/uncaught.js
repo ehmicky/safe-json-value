@@ -1,3 +1,5 @@
+import normalizeException from 'normalize-exception'
+
 // When dynamic functions (`object.toJSON()`, `get` method or Proxy hook):
 //  - Returns new objects (as opposed to reference to existing objects)
 //  - That contains properties with dynamic functions themselves
@@ -23,7 +25,7 @@ export const handleUnsafeException = function ({
     oldValue: value,
     newValue: undefined,
     reason: 'unsafeException',
-    error,
+    error: normalizeException(error),
   })
   return { value: undefined, size }
 }

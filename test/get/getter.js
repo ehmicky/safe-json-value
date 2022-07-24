@@ -75,7 +75,7 @@ test('Omit getters that throw', (t) => {
   // eslint-disable-next-line fp/no-mutating-methods
   const input = Object.defineProperty({}, 'prop', {
     get() {
-      throw error
+      throw error.message
     },
     enumerable: true,
     configurable: true,

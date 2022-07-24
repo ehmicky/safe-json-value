@@ -38,7 +38,7 @@ test('Handles object.toJSON() that throws', (t) => {
   const error = new Error('test')
   const input = {
     toJSON() {
-      throw error
+      throw error.message
     },
   }
   const { value, changes } = safeJsonValue(input)
