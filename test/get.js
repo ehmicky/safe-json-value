@@ -73,3 +73,37 @@ test('Resolve setters without getters', (t) => {
     ],
   })
 })
+
+each(
+  [
+    {
+      descriptor: { configurable: false, writable: true },
+      reason: 'notConfigurable',
+    },
+    {
+      descriptor: { configurable: true, writable: false },
+      reason: 'notWritable',
+    },
+  ],
+  ({ title }, { descriptor, reason }) => {
+    test(`Make properties configurable and writable | ${title}`, (t) => {
+      // eslint-disable-next-line fp/no-mutating-methods
+      const input = Object.defineProperty({}, 'prop', {
+        value: true,
+        enumerable: true,
+        ...descriptor,
+      })
+      const { value, changes } = safeJsonValue(input)
+      t.deepEqual(value, { prop: true })
+      t.deepEqual(Object.getOwnPropertyDescriptor(value, 'prop'), {
+        value: true,
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      })
+      t.deepEqual(changes, [
+        { path: ['prop'], oldValue: true, newValue: true, reason },
+      ])
+    })
+  },
+)
