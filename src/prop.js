@@ -58,7 +58,7 @@ const transformPropValue = function ({
   const { prop, safe } = safeGetProp({ parent, key, changes, path })
 
   if (!safe) {
-    return prop
+    return { value: prop, size }
   }
 
   const { prop: propA, validKey } = omitInvalidKey({
@@ -70,7 +70,7 @@ const transformPropValue = function ({
   })
 
   if (!validKey) {
-    return prop
+    return { value: prop, size }
   }
 
   return transformValue({
