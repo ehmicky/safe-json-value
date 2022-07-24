@@ -29,8 +29,8 @@ each(
         changes: [
           {
             ...change,
-            newValue: undefined,
             oldValue: value,
+            newValue: undefined,
             reason: 'invalidType',
           },
         ],

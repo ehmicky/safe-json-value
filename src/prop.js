@@ -55,8 +55,24 @@ const transformPropValue = function ({
   maxSize,
   transformValue,
 }) {
-  const prop = safeGetProp({ parent, key, changes, path })
-  const propA = omitInvalidKey({ parent, key, prop, changes, path })
+  const { prop, safe } = safeGetProp({ parent, key, changes, path })
+
+  if (!safe) {
+    return prop
+  }
+
+  const { prop: propA, validKey } = omitInvalidKey({
+    parent,
+    key,
+    prop,
+    changes,
+    path,
+  })
+
+  if (!validKey) {
+    return prop
+  }
+
   return transformValue({
     value: propA,
     changes,

@@ -11,7 +11,8 @@ export const safeGetChangeProp = function ({ parent, key }) {
 // throws, so we cannot add this to the `changes`.
 export const safeGetProp = function ({ parent, key, changes, path }) {
   try {
-    return getProp({ parent, key, changes, path })
+    const prop = getProp({ parent, key, changes, path })
+    return { prop, safe: true }
   } catch (error) {
     changes.push({
       path,
@@ -20,6 +21,7 @@ export const safeGetProp = function ({ parent, key, changes, path }) {
       reason: 'unsafeGetter',
       error,
     })
+    return { prop: undefined, safe: false }
   }
 }
 

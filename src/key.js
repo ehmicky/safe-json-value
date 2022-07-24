@@ -9,7 +9,7 @@ export const omitInvalidKey = function ({ parent, key, prop, changes, path }) {
       newValue: undefined,
       reason: 'symbolKey',
     })
-    return
+    return { prop: undefined, validKey: false }
   }
 
   if (!isEnum.call(parent, key) && !Array.isArray(parent)) {
@@ -19,10 +19,10 @@ export const omitInvalidKey = function ({ parent, key, prop, changes, path }) {
       newValue: undefined,
       reason: 'notEnumerable',
     })
-    return
+    return { prop: undefined, validKey: false }
   }
 
-  return prop
+  return { prop, validKey: true }
 }
 
 const { propertyIsEnumerable: isEnum } = Object.prototype
