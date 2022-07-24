@@ -120,10 +120,6 @@ _Type_: `Array<string | symbol | number>`
 
 Property path.
 
-It can be manipulated or
-[stringified](https://github.com/ehmicky/wild-wild-parser/#serializepathpatharray)
-using [`wild-wild-parser`](https://github.com/ehmicky/wild-wild-parser).
-
 ##### changes[*].oldValue
 
 _Type_: `any`
