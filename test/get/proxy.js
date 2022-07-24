@@ -41,8 +41,8 @@ test('Omit proxy get hooks that throw', (t) => {
         path: ['prop'],
         oldValue: undefined,
         newValue: undefined,
-        reason: 'unsafeGetter',
         error,
+        reason: 'unsafeGetter',
       },
     ],
   })

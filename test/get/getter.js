@@ -60,8 +60,8 @@ test('Resolve setters without getters', (t) => {
     changes: [
       {
         path: ['prop'],
-        oldValue: undefined,
         newValue: undefined,
+        oldValue: undefined,
         reason: 'getter',
       },
       {
