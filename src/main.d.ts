@@ -22,6 +22,36 @@ type PartialDeep<T> = T extends Array<infer ArrayItem>
   ? { [key in keyof T]?: PartialDeep<T[key]> }
   : T
 
+type ReasonWithError = 'uncaughtException' | 'unsafeGetter' | 'unsafeToJSON'
+type ReasonWithoutError =
+  | 'bigint'
+  | 'class'
+  | 'cycle'
+  | 'function'
+  | 'getter'
+  | 'infiniteNumber'
+  | 'maxSize'
+  | 'notArrayIndex'
+  | 'notEnumerable'
+  | 'notConfigurable'
+  | 'notWritable'
+  | 'symbolKey'
+  | 'symbolValue'
+  | 'toJSON'
+  | 'undefined'
+export type Reason = ReasonWithError | ReasonWithoutError
+
+/**
+ *
+ */
+export interface Change<ReasonValue extends Reason = Reason> {
+  path: PropertyKey[]
+  oldValue: unknown
+  newValue: unknown
+  reason: ReasonValue
+  error?: ReasonValue extends ReasonWithoutError ? undefined : Error
+}
+
 /**
  *
  * @example
@@ -31,4 +61,7 @@ type PartialDeep<T> = T extends Array<infer ArrayItem>
 export default function safeJsonValue<T>(
   value: T,
   options?: Options,
-): PartialDeep<T> | undefined
+): {
+  value: PartialDeep<T> | undefined
+  changes: Change[]
+}

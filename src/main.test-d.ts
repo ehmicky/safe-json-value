@@ -7,14 +7,18 @@ import {
 
 import safeJsonValue, { Options } from './main.js'
 
-expectType<undefined>(safeJsonValue(undefined))
-expectType<true | undefined>(safeJsonValue(true))
-expectType<never[] | undefined>(safeJsonValue([]))
-expectType<{} | undefined>(safeJsonValue({}))
-expectType<(0 | true)[] | undefined>(safeJsonValue([0, true]))
-expectType<{ a?: true } | undefined>(safeJsonValue({ a: true }))
-expectType<{ a?: true }[] | undefined>(safeJsonValue([{ a: true }]))
-expectType<{ a?: (0 | true)[] } | undefined>(safeJsonValue({ a: [0, true] }))
+const trueValue = true as const
+const arrayValue = [0 as const, trueValue]
+expectType<undefined>(safeJsonValue(undefined).value)
+expectType<true | undefined>(safeJsonValue(trueValue).value)
+expectType<never[] | undefined>(safeJsonValue([]).value)
+expectType<{} | undefined>(safeJsonValue({}).value)
+expectType<(0 | true)[] | undefined>(safeJsonValue(arrayValue).value)
+expectType<{ a?: true } | undefined>(safeJsonValue({ a: trueValue }).value)
+expectType<{ a?: true }[] | undefined>(safeJsonValue([{ a: trueValue }]).value)
+expectType<{ a?: (0 | true)[] } | undefined>(
+  safeJsonValue({ a: arrayValue }).value,
+)
 
 safeJsonValue('', {})
 expectAssignable<Options>({})
