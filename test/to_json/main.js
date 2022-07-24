@@ -29,7 +29,7 @@ test('Handles object.toJSON() returning undefined', (t) => {
       path: ['prop'],
       oldValue: undefined,
       newValue: undefined,
-      reason: 'invalidType',
+      reason: 'undefined',
     },
   ])
 })
@@ -55,7 +55,7 @@ test('Handles object.toJSON() that throws', (t) => {
       path: [],
       oldValue: undefined,
       newValue: undefined,
-      reason: 'invalidType',
+      reason: 'undefined',
     },
   ])
 })
@@ -88,7 +88,7 @@ test('Does not call object.toJSON() recursively', (t) => {
       path: ['toJSON'],
       oldValue: newValue.toJSON,
       newValue: undefined,
-      reason: 'invalidType',
+      reason: 'function',
     },
   ])
 })

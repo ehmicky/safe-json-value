@@ -114,9 +114,13 @@ _Type_: `string`
 
 Reason for the change among:
 
+- [`"bigint"`](#bigint)
 - [`"cycle"`](#cycles)
-- [`"invalidType"`](#functions)
+- [`"function"`](#functions)
+- [`"infiniteNumber"`](#nan-and-infinity)
+- [`"symbolValue"`](#symbol-values)
 - [`"uncaughtException"`](#infinite-recursion)
+- [`"undefined"`](#undefined)
 
 ##### changes[*].error
 

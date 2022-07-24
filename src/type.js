@@ -3,23 +3,31 @@
 //  - `NaN` and `[-]Infinity` would be transformed to `null`
 //  - `undefined`, functions and symbols would be omitted
 export const omitInvalidTypes = function (value, changes, path) {
-  if (!shouldFilter(value)) {
+  const reason = getInvalidTypeReason(value)
+
+  if (reason === undefined) {
     return value
   }
 
-  changes.push({
-    path,
-    oldValue: value,
-    newValue: undefined,
-    reason: 'invalidType',
-  })
+  changes.push({ path, oldValue: value, newValue: undefined, reason })
 }
 
-const shouldFilter = function (value) {
+const getInvalidTypeReason = function (value) {
   const type = typeof value
-  return (
-    FILTERED_TYPES.has(type) || (type === 'number' && !Number.isFinite(value))
-  )
+  const reason = INVALID_TYPES[type]
+
+  if (reason !== undefined) {
+    return reason
+  }
+
+  if (type === 'number' && !Number.isFinite(value)) {
+    return 'infiniteNumber'
+  }
 }
 
-const FILTERED_TYPES = new Set(['function', 'symbol', 'undefined', 'bigint'])
+const INVALID_TYPES = {
+  function: 'function',
+  symbol: 'symbolValue',
+  undefined: 'undefined',
+  bigint: 'bigint',
+}

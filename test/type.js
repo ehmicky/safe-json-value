@@ -4,14 +4,13 @@ import { each } from 'test-each'
 
 each(
   [
-    () => {},
-    Symbol('test'),
-    undefined,
-    // eslint-disable-next-line no-magic-numbers
-    0n,
-    Number.NaN,
-    Number.POSITIVE_INFINITY,
-    Number.NEGATIVE_INFINITY,
+    { value: () => {}, reason: 'function' },
+    { value: Symbol('test'), reason: 'symbolValue' },
+    { value: undefined, reason: 'undefined' },
+    { value: 0n, reason: 'bigint' },
+    { value: Number.NaN, reason: 'infiniteNumber' },
+    { value: Number.POSITIVE_INFINITY, reason: 'infiniteNumber' },
+    { value: Number.NEGATIVE_INFINITY, reason: 'infiniteNumber' },
   ],
   [
     { getInput: (value) => value, output: undefined, change: { path: [] } },
@@ -21,19 +20,12 @@ each(
       change: { path: ['prop'] },
     },
   ],
-  ({ title }, value, { getInput, output, change }) => {
+  ({ title }, { value, reason }, { getInput, output, change }) => {
     test(`Omit invalid types | ${title}`, (t) => {
       const input = getInput(value)
       t.deepEqual(safeJsonValue(input), {
         value: output,
-        changes: [
-          {
-            ...change,
-            oldValue: value,
-            newValue: undefined,
-            reason: 'invalidType',
-          },
-        ],
+        changes: [{ ...change, oldValue: value, newValue: undefined, reason }],
       })
     })
   },

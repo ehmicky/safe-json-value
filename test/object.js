@@ -17,7 +17,7 @@ test('Omit removed properties', (t) => {
       path: ['prop'],
       oldValue: undefined,
       newValue: undefined,
-      reason: 'invalidType',
+      reason: 'undefined',
     },
   ])
   t.false('prop' in value)

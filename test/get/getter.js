@@ -68,7 +68,7 @@ test('Resolve setters without getters', (t) => {
         path: ['prop'],
         oldValue: undefined,
         newValue: undefined,
-        reason: 'invalidType',
+        reason: 'undefined',
       },
     ],
   })

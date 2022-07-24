@@ -9,28 +9,28 @@ each(
       input: { two: undefined },
       output: {},
       key: 'two',
-      change: { reason: 'invalidType' },
+      change: { reason: 'undefined' },
     },
     {
       input: { one: true, two: undefined },
       output: { one: true },
       key: 'two',
       sizeIncrement: ','.length + JSON.stringify('two').length + ':'.length - 1,
-      change: { reason: 'invalidType' },
+      change: { reason: 'undefined' },
     },
     {
       input: [undefined],
       output: [],
       key: 0,
-      change: { reason: 'invalidType' },
-      sizeChange: { reason: 'invalidType' },
+      change: { reason: 'undefined' },
+      sizeChange: { reason: 'undefined' },
     },
     {
       input: [1, undefined],
       output: [1],
       key: 1,
       sizeIncrement: ','.length - 1,
-      change: { reason: 'invalidType' },
+      change: { reason: 'undefined' },
     },
     {
       // eslint-disable-next-line fp/no-mutating-methods
