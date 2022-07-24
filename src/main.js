@@ -299,13 +299,12 @@ const recurseArray = function ({
 }) {
   const newArray = []
   // eslint-disable-next-line fp/no-let
-  let empty = true
-  // eslint-disable-next-line fp/no-let
-  let sizeA = size
+  let state = { empty: true, size }
 
   // eslint-disable-next-line fp/no-loops, fp/no-mutation, fp/no-let
   for (let index = 0; index < array.length; index += 1) {
-    const returnValue = recurseProp({
+    // eslint-disable-next-line fp/no-mutation
+    state = recurseProp({
       parent: array,
       changes,
       ancestors,
@@ -313,23 +312,18 @@ const recurseArray = function ({
       maxSize,
       key: index,
       type: 'arrayItem',
-      empty,
-      size: sizeA,
+      empty: state.empty,
+      size: state.size,
     })
 
     // eslint-disable-next-line max-depth
-    if (returnValue !== undefined) {
-      const { empty: emptyA, size: sizeB, value } = returnValue
-      // eslint-disable-next-line fp/no-mutation
-      empty = emptyA
-      // eslint-disable-next-line fp/no-mutation
-      sizeA = sizeB
+    if (state.value !== undefined) {
       // eslint-disable-next-line fp/no-mutating-methods
-      newArray.push(value)
+      newArray.push(state.value)
     }
   }
 
-  return { value: newArray, size: sizeA }
+  return { value: newArray, size: state.size }
 }
 
 // Recurse over object properties.
@@ -348,39 +342,32 @@ const recurseObject = function ({
 }) {
   const newObject = getNewObject(object)
   // eslint-disable-next-line fp/no-let
-  let empty = true
-  // eslint-disable-next-line fp/no-let
-  let sizeA = size
+  let state = { empty: true, size }
 
   // eslint-disable-next-line fp/no-loops
   for (const key of Reflect.ownKeys(object)) {
-    const returnValue = recurseProp({
+    // eslint-disable-next-line fp/no-mutation
+    state = recurseProp({
       parent: object,
       changes,
       ancestors,
       path,
       maxSize,
-      newObject,
       key,
       type: 'objectProp',
-      empty,
-      size: sizeA,
+      empty: state.empty,
+      size: state.size,
     })
 
     // eslint-disable-next-line max-depth
-    if (returnValue !== undefined) {
-      const { empty: emptyA, size: sizeB, value } = returnValue
+    if (state.value !== undefined) {
       // eslint-disable-next-line fp/no-mutation
-      empty = emptyA
-      // eslint-disable-next-line fp/no-mutation
-      sizeA = sizeB
-      // eslint-disable-next-line fp/no-mutation
-      newObject[key] = value
+      newObject[key] = state.value
     }
   }
 
   addClassChange({ object, newObject, changes, path })
-  return { value: newObject, size: sizeA }
+  return { value: newObject, size: state.size }
 }
 
 // When the object has a `null` prototype, we keep it.
@@ -412,8 +399,8 @@ const recurseProp = function ({
   maxSize,
   key,
   type,
-  size,
   empty,
+  size,
 }) {
   const propPath = [...path, key]
   const { size: sizeA, stop } = addSize({
@@ -426,7 +413,7 @@ const recurseProp = function ({
   })
 
   if (stop) {
-    return
+    return { empty, size }
   }
 
   const { value, size: sizeB } = transformProp({
@@ -440,7 +427,7 @@ const recurseProp = function ({
   })
 
   if (value === undefined) {
-    return
+    return { empty, size }
   }
 
   return { empty: false, size: sizeB, value }
