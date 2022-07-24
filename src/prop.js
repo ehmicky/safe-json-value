@@ -70,7 +70,7 @@ const transformPropValue = function ({
   })
 
   if (!validKey) {
-    return { value: prop, size }
+    return { value: propA, size }
   }
 
   return transformValue({
