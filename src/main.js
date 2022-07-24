@@ -313,8 +313,8 @@ const recurseArray = function ({
       maxSize,
       key: index,
       type: 'arrayItem',
-      size: sizeA,
       empty,
+      size: sizeA,
     })
 
     // eslint-disable-next-line max-depth
@@ -348,12 +348,13 @@ const recurseObject = function ({
 }) {
   const newObject = getNewObject(object)
   // eslint-disable-next-line fp/no-let
-  let state = { empty: true, size }
+  let empty = true
+  // eslint-disable-next-line fp/no-let
+  let sizeA = size
 
   // eslint-disable-next-line fp/no-loops
   for (const key of Reflect.ownKeys(object)) {
-    // eslint-disable-next-line fp/no-mutation
-    state = recurseObjectProp({
+    const returnValue = recurseObjectProp({
       parent: object,
       changes,
       ancestors,
@@ -362,12 +363,24 @@ const recurseObject = function ({
       newObject,
       key,
       type: 'objectProp',
-      state,
+      empty,
+      size: sizeA,
     })
+
+    // eslint-disable-next-line max-depth
+    if (returnValue !== undefined) {
+      const { empty: emptyA, size: sizeB, value } = returnValue
+      // eslint-disable-next-line fp/no-mutation
+      empty = emptyA
+      // eslint-disable-next-line fp/no-mutation
+      sizeA = sizeB
+      // eslint-disable-next-line fp/no-mutation
+      newObject[key] = value
+    }
   }
 
   addClassChange({ object, newObject, changes, path })
-  return { value: newObject, size: state.size }
+  return { value: newObject, size: sizeA }
 }
 
 // When the object has a `null` prototype, we keep it.
@@ -439,23 +452,23 @@ const recurseObjectProp = function ({
   ancestors,
   path,
   maxSize,
-  newObject,
   key,
   type,
-  state,
+  empty,
+  size,
 }) {
   const propPath = [...path, key]
   const { size: sizeA, stop } = addSize({
     type,
-    size: state.size,
+    size,
     maxSize,
     changes,
     path: propPath,
-    context: { empty: state.empty, parent, key },
+    context: { empty, parent, key },
   })
 
   if (stop) {
-    return state
+    return
   }
 
   const { value, size: sizeB } = transformProp({
@@ -469,12 +482,10 @@ const recurseObjectProp = function ({
   })
 
   if (value === undefined) {
-    return state
+    return
   }
 
-  // eslint-disable-next-line fp/no-mutation, no-param-reassign
-  newObject[key] = value
-  return { empty: false, size: sizeB }
+  return { empty: false, size: sizeB, value }
 }
 
 // Recurse over an object property or array index
