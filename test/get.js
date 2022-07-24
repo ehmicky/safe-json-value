@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import test from 'ava'
 import safeJsonValue from 'safe-json-value'
 import { each } from 'test-each'
@@ -69,6 +70,30 @@ test('Resolve setters without getters', (t) => {
         oldValue: undefined,
         newValue: undefined,
         reason: 'invalidType',
+      },
+    ],
+  })
+})
+
+test('Omit getters that throw', (t) => {
+  const error = new Error('test')
+  // eslint-disable-next-line fp/no-mutating-methods
+  const input = Object.defineProperty({}, 'prop', {
+    get() {
+      throw error
+    },
+    enumerable: true,
+    configurable: true,
+  })
+  t.deepEqual(safeJsonValue(input), {
+    value: {},
+    changes: [
+      {
+        path: ['prop'],
+        oldValue: undefined,
+        newValue: undefined,
+        reason: 'unsafeGetter',
+        error,
       },
     ],
   })
