@@ -79,30 +79,36 @@ each([...strings], ({ title }, key) => {
   })
 })
 
-test('Does not recurse if object property key too big', (t) => {
-  const input = { prop: undefined }
-  const output = {}
-  const size = JSON.stringify(output).length
-  t.deepEqual(safeJsonValue(input), {
-    value: output,
-    changes: [
-      {
-        path: ['prop'],
-        oldValue: undefined,
-        newValue: undefined,
-        reason: 'invalidType',
-      },
-    ],
-  })
-  t.deepEqual(safeJsonValue(input, { maxSize: size }), {
-    value: output,
-    changes: [
-      {
-        path: ['prop'],
-        oldValue: undefined,
-        newValue: undefined,
-        reason: 'maxSize',
-      },
-    ],
-  })
-})
+each(
+  [
+    { input: { prop: undefined }, output: {}, key: 'prop' },
+    { input: [1, undefined], output: [1], key: 1 },
+  ],
+  ({ title }, { input, output, key }) => {
+    test(`Does not recurse if object property key or array comma is over options.maxSize | ${title}`, (t) => {
+      const size = JSON.stringify(output).length
+      t.deepEqual(safeJsonValue(input), {
+        value: output,
+        changes: [
+          {
+            path: [key],
+            oldValue: undefined,
+            newValue: undefined,
+            reason: 'invalidType',
+          },
+        ],
+      })
+      t.deepEqual(safeJsonValue(input, { maxSize: size }), {
+        value: output,
+        changes: [
+          {
+            path: [key],
+            oldValue: undefined,
+            newValue: undefined,
+            reason: 'maxSize',
+          },
+        ],
+      })
+    })
+  },
+)
