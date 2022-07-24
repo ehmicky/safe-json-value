@@ -153,6 +153,7 @@ const safeGetArrayProp = function (array, key) {
 //     - This favors maximizing the number of fields within the allowed
 //       `maxSize`
 //  - This is easier to implement
+// We omit cycles since `JSON.stringify()` throws on them.
 const recurseValue = function ({ value, changes, ancestors, path }) {
   if (!isObject(value)) {
     return value
