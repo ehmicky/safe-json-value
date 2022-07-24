@@ -44,7 +44,7 @@ const transformValue = function ({
     const valueA = callToJSON(value, changes, path)
     const valueB = filterValue(valueA, changes, path)
     addNotArrayIndexChanges(valueB, changes, path)
-    return safeRecurseValue({
+    return checkSizeThenRecurse({
       value: valueB,
       changes,
       ancestors,
@@ -201,7 +201,7 @@ const safeGetChangeProp = function (objectOrArray, key) {
 //       `maxSize`
 //  - This is easier to implement
 // We omit cycles since `JSON.stringify()` throws on them.
-const safeRecurseValue = function ({
+const checkSizeThenRecurse = function ({
   value,
   changes,
   ancestors,
@@ -209,7 +209,7 @@ const safeRecurseValue = function ({
   size,
   maxSize,
 }) {
-  const { size: sizeA, stop } = addSize({
+  const { size: newSize, stop } = addSize({
     type: 'value',
     size,
     maxSize,
@@ -217,13 +217,30 @@ const safeRecurseValue = function ({
     path,
     context: value,
   })
+  return stop
+    ? { value: undefined, size }
+    : checkCycleThenRecurse({
+        value,
+        changes,
+        ancestors,
+        path,
+        size,
+        newSize,
+        maxSize,
+      })
+}
 
-  if (stop) {
-    return { value: undefined, size: sizeA }
-  }
-
+const checkCycleThenRecurse = function ({
+  value,
+  changes,
+  ancestors,
+  path,
+  size,
+  newSize,
+  maxSize,
+}) {
   if (!isObject(value)) {
-    return { value, size: sizeA }
+    return { value, size: newSize }
   }
 
   if (ancestors.has(value)) {
@@ -237,16 +254,16 @@ const safeRecurseValue = function ({
   }
 
   ancestors.add(value)
-  const { value: valueA, size: sizeB } = recurseValue({
+  const { value: valueA, size: newSizeA } = recurseValue({
     value,
     changes,
     ancestors,
     path,
-    size: sizeA,
+    size: newSize,
     maxSize,
   })
   ancestors.delete(value)
-  return { value: valueA, size: sizeB }
+  return { value: valueA, size: newSizeA }
 }
 
 const recurseValue = function ({
