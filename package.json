@@ -14,7 +14,7 @@
   "description": "JSON serialization should never fail",
   "keywords": [],
   "license": "Apache-2.0",
-  "homepage": "https://bit.ly/3BlseyJ",
+  "homepage": "https://www.github.com/ehmicky/safe-json-value",
   "repository": "ehmicky/safe-json-value",
   "bugs": {
     "url": "https://github.com/ehmicky/safe-json-value/issues"
