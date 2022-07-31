@@ -1,3 +1,9 @@
+# 1.5.0
+
+## Documentation
+
+- Add logo
+
 # 1.4.2
 
 ## Bug fixes
