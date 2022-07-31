@@ -8,6 +8,8 @@ import { transformProp } from './prop.js'
 // We iterate in `Reflect.ownKeys()` order, not in sorted keys order.
 //  - This is faster
 //  - This preserves the object properties order
+// Uses imperative logic for performance reasons.
+/* eslint-disable fp/no-let, fp/no-loops, fp/no-mutation, max-depth */
 export const recurseObject = function ({
   object,
   changes,
@@ -18,12 +20,9 @@ export const recurseObject = function ({
   transformValue,
 }) {
   const newObject = getNewObject(object)
-  // eslint-disable-next-line fp/no-let
   let state = { empty: true, size }
 
-  // eslint-disable-next-line fp/no-loops
   for (const key of Reflect.ownKeys(object)) {
-    // eslint-disable-next-line fp/no-mutation
     state = transformProp({
       parent: object,
       changes,
@@ -37,9 +36,7 @@ export const recurseObject = function ({
       transformValue,
     })
 
-    // eslint-disable-next-line max-depth
     if (state.value !== undefined) {
-      // eslint-disable-next-line fp/no-mutation
       newObject[key] = state.value
     }
   }
@@ -47,6 +44,7 @@ export const recurseObject = function ({
   addClassChange({ object, newObject, changes, path })
   return { value: newObject, size: state.size }
 }
+/* eslint-enable fp/no-let, fp/no-loops, fp/no-mutation, max-depth */
 
 // When the object has a `null` prototype, we keep it.
 //  - This reduces the number of changes
