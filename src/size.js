@@ -93,6 +93,9 @@ const SIZED_TYPES = {
 //  - Control characters and Unicode characters
 //  - Invalid Unicode sequences
 // This can throw if `value` is a large strings with many backslash sequences.
+// We use the character length instead of the UTF-8 bytes length:
+//  - This is less proper
+//  - However, this is much faster and is good enough for this specific purpose
 const getJsonLength = function (value) {
   try {
     return JSON.stringify(value).length
