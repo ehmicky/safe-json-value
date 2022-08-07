@@ -462,6 +462,8 @@ safeJsonValue(input).value // { one: true }
 
 - [`is-json-value`](https://github.com/ehmicky/is-json-value): Check if a value
   is valid JSON
+- [`truncate-json`](https://github.com/ehmicky/truncate-json): Truncate a JSON
+  string
 
 # Support
 
