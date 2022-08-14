@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "is-plain-obj": "^4.1.0",
-    "normalize-exception": "^1.7.0"
+    "normalize-exception": "^1.8.0"
   },
   "devDependencies": {
     "@ehmicky/dev-tasks": "^1.0.84",
