@@ -466,6 +466,8 @@ safeJsonValue(input).value // { one: true }
   string
 - [`guess-json-indent`](https://github.com/ehmicky/guess-json-indent): Guess the
   indentation of a JSON string
+- [`error-serializer`](https://github.com/ehmicky/error-serializer): Convert
+  errors to/from plain objects
 
 # Support
 
