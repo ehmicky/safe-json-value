@@ -1,3 +1,9 @@
+# 1.6.0
+
+## Features
+
+- Reduce npm package size
+
 # 1.5.0
 
 ## Documentation
