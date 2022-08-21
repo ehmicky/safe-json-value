@@ -1,3 +1,9 @@
+# 1.7.0
+
+## Features
+
+- Improve error handling
+
 # 1.6.0
 
 ## Features
