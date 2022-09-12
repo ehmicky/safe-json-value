@@ -13,7 +13,7 @@
 
 # Features
 
-Prevent `JSON.serialize()` from:
+Prevent `JSON.stringify()` from:
 
 - [Throwing](#exceptions)
 - [Changing types](#unexpected-types)
