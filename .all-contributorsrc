@@ -20,7 +20,17 @@
         "ideas",
         "doc"
       ]
+    },
+    {
+      "login": "papb",
+      "name": "Pedro Augusto de Paula Barbosa",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20914054?v=4",
+      "profile": "https://github.com/papb",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "skipCi": true
 }
