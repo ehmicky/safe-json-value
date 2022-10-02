@@ -112,3 +112,12 @@ safeJsonValue('', { shallow: true })
 expectAssignable<Options>({ shallow: true })
 expectError(safeJsonValue('', { shallow: 'true' }))
 expectNotAssignable<Options>({ shallow: 'true' })
+
+expectType<string | undefined>(safeJsonValue({ a: new Date() }).value?.a)
+expectType<Date | undefined>(
+  safeJsonValue({ a: new Date() }, { shallow: true }).value?.a,
+)
+expectType<string | undefined>(safeJsonValue([new Date()]).value?.[0])
+expectType<Date | undefined>(
+  safeJsonValue([new Date()], { shallow: true }).value?.[0],
+)

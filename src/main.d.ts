@@ -30,8 +30,8 @@ export interface Options {
 }
 
 type InvalidJSONValue = bigint | Function | undefined | symbol
-type ReturnValue<T> = T extends Array<infer ArrayItem>
-  ? Array<ReturnValue<ArrayItem>>
+type ReturnValue<T, Shallow extends boolean> = T extends Array<infer ArrayItem>
+  ? Array<Shallow extends true ? ArrayItem : ReturnValue<ArrayItem, Shallow>>
   : T extends InvalidJSONValue
   ? undefined
   : T extends Date
@@ -42,7 +42,9 @@ type ReturnValue<T> = T extends Array<infer ArrayItem>
   ? {
       [key in keyof T as T[key] extends InvalidJSONValue
         ? never
-        : Exclude<key, symbol>]?: ReturnValue<T[key]>
+        : Exclude<key, symbol>]?: Shallow extends true
+        ? T[key]
+        : ReturnValue<T[key], Shallow>
     }
   : T
 
@@ -132,9 +134,9 @@ export type Change<ReasonValue extends Reason = Reason> = {
  * // ]
  * ```
  */
-export default function safeJsonValue<T>(
+export default function safeJsonValue<T, OptionsArg extends Options = {}>(
   value: T,
-  options?: Options,
+  options?: OptionsArg,
 ): {
   /**
    * Copy of the input `value` after applying all the changes to make
@@ -143,7 +145,9 @@ export default function safeJsonValue<T>(
    * The top-level `value` itself might be changed (including to `undefined`) if
    * it is either invalid JSON or has a `toJSON()` method.
    */
-  value: ReturnValue<T> | undefined
+  value:
+    | ReturnValue<T, OptionsArg['shallow'] extends true ? true : false>
+    | undefined
 
   /**
    * List of changes applied to `value`.
