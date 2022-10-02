@@ -16,7 +16,7 @@ export const recurseArray = function ({
   path,
   size,
   maxSize,
-  transformValue,
+  recurse,
 }) {
   const newArray = []
 
@@ -33,7 +33,7 @@ export const recurseArray = function ({
       type: 'arrayItem',
       empty: state.empty,
       size: state.size,
-      transformValue,
+      recurse,
     })
 
     if (state.value !== undefined) {

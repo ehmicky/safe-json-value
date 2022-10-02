@@ -11,7 +11,7 @@ export const checkCycleThenRecurse = function ({
   size,
   newSize,
   maxSize,
-  transformValue,
+  recurse,
 }) {
   if (!isObject(value)) {
     return { value, size: newSize }
@@ -35,7 +35,7 @@ export const checkCycleThenRecurse = function ({
     path,
     size: newSize,
     maxSize,
-    transformValue,
+    recurse,
   })
   ancestors.delete(value)
   return { value: valueA, size: newSizeA }
@@ -48,7 +48,7 @@ const recurseValue = function ({
   path,
   size,
   maxSize,
-  transformValue,
+  recurse,
 }) {
   return Array.isArray(value)
     ? recurseArray({
@@ -58,7 +58,7 @@ const recurseValue = function ({
         path,
         size,
         maxSize,
-        transformValue,
+        recurse,
       })
     : recurseObject({
         object: value,
@@ -67,6 +67,6 @@ const recurseValue = function ({
         path,
         size,
         maxSize,
-        transformValue,
+        recurse,
       })
 }

@@ -13,7 +13,7 @@ import { handleUnsafeException } from './uncaught.js'
 //  - Supporting other formats than JSON
 export default function safeJsonValue(
   value,
-  { maxSize = DEFAULT_MAX_SIZE } = {},
+  { maxSize = DEFAULT_MAX_SIZE, shallow = false } = {},
 ) {
   const changes = []
   const ancestors = new Set([])
@@ -24,6 +24,7 @@ export default function safeJsonValue(
     path: [],
     size: 0,
     maxSize,
+    shallow,
   })
   return { value: newValue, changes }
 }
@@ -38,6 +39,7 @@ const transformValue = function ({
   path,
   size,
   maxSize,
+  shallow,
 }) {
   try {
     const valueA = callToJSON(value, changes, path)
@@ -50,6 +52,7 @@ const transformValue = function ({
       path,
       size,
       maxSize,
+      shallow,
     })
   } catch (error) {
     return handleUnsafeException({ value, changes, path, error, size })
@@ -74,6 +77,7 @@ const checkSizeThenRecurse = function ({
   path,
   size,
   maxSize,
+  shallow,
 }) {
   const { size: newSize, stop } = addSize({
     type: 'value',
@@ -83,16 +87,24 @@ const checkSizeThenRecurse = function ({
     path,
     context: value,
   })
-  return stop
-    ? { value: undefined, size }
-    : checkCycleThenRecurse({
-        value,
-        changes,
-        ancestors,
-        path,
-        size,
-        newSize,
-        maxSize,
-        transformValue,
-      })
+
+  if (stop) {
+    return { value: undefined, size }
+  }
+
+  const recurse = shallow ? identity : transformValue
+  return checkCycleThenRecurse({
+    value,
+    changes,
+    ancestors,
+    path,
+    size,
+    newSize,
+    maxSize,
+    recurse,
+  })
+}
+
+const identity = function ({ value, changes }) {
+  return { value, changes }
 }

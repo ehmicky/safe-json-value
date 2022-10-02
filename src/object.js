@@ -17,7 +17,7 @@ export const recurseObject = function ({
   path,
   size,
   maxSize,
-  transformValue,
+  recurse,
 }) {
   const newObject = getNewObject(object)
   let state = { empty: true, size }
@@ -33,7 +33,7 @@ export const recurseObject = function ({
       type: 'objectProp',
       empty: state.empty,
       size: state.size,
-      transformValue,
+      recurse,
     })
 
     if (state.value !== undefined) {

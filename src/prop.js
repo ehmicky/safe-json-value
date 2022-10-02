@@ -13,7 +13,7 @@ export const transformProp = function ({
   type,
   empty,
   size,
-  transformValue,
+  recurse,
 }) {
   const propPath = [...path, key]
   const { size: sizeA, stop } = addSize({
@@ -37,7 +37,7 @@ export const transformProp = function ({
     path: propPath,
     size: sizeA,
     maxSize,
-    transformValue,
+    recurse,
   })
   return value === undefined
     ? { empty, size }
@@ -53,7 +53,7 @@ const transformPropValue = function ({
   path,
   size,
   maxSize,
-  transformValue,
+  recurse,
 }) {
   const { prop, safe } = safeGetProp({ parent, key, changes, path })
 
@@ -73,12 +73,5 @@ const transformPropValue = function ({
     return { value: propA, size }
   }
 
-  return transformValue({
-    value: propA,
-    changes,
-    ancestors,
-    path,
-    size,
-    maxSize,
-  })
+  return recurse({ value: propA, changes, ancestors, path, size, maxSize })
 }
