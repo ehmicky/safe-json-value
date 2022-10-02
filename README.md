@@ -71,7 +71,7 @@ Makes `value` [JSON-safe](#changes-1) by:
 - Resolving properties which would [change value](#unresolved-values) with
   `JSON.stringify()`
 
-Applied recursively on object/array properties. This never throws.
+This never throws.
 
 ### Options
 
@@ -93,6 +93,14 @@ completely removed, not truncated (including strings).
 const input = { one: true, two: 'a'.repeat(1e6) }
 JSON.stringify(safeJsonValue(input, { maxSize: 1e5 }).value) // '{"one":true}"
 ```
+
+#### shallow
+
+_Type_: `boolean`\
+_Default_: `false`
+
+If `false`, this is applied recursively on object/array properties. Please note
+that [cycles](#cycles) are not removed when this is `true`.
 
 ### Return value
 

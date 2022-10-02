@@ -1,3 +1,9 @@
+# 1.8.0
+
+## Features
+
+- Add [`shallow` option](README.md#shallow). The logic is still deep by default.
+
 # 1.7.0
 
 ## Features
