@@ -107,3 +107,8 @@ safeJsonValue('', { maxSize: Number.POSITIVE_INFINITY })
 expectAssignable<Options>({ maxSize: Number.POSITIVE_INFINITY })
 expectError(safeJsonValue('', { maxSize: '0' }))
 expectNotAssignable<Options>({ maxSize: '0' })
+
+safeJsonValue('', { shallow: true })
+expectAssignable<Options>({ shallow: true })
+expectError(safeJsonValue('', { shallow: 'true' }))
+expectNotAssignable<Options>({ shallow: 'true' })

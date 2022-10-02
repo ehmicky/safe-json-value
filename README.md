@@ -99,8 +99,8 @@ JSON.stringify(safeJsonValue(input, { maxSize: 1e5 }).value) // '{"one":true}"
 _Type_: `boolean`\
 _Default_: `false`
 
-If `false`, this is applied recursively on object/array properties. Please note
-that [cycles](#cycles) are not removed when this is `true`.
+If `false`, object/array properties are processed recursively. Please note that
+[cycles](#cycles) are not removed when this is `true`.
 
 ### Return value
 

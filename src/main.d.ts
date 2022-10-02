@@ -19,6 +19,14 @@ export interface Options {
    * ```
    */
   readonly maxSize?: number
+
+  /**
+   * If `false`, object/array properties are processed recursively.
+   * Please note that cycles are not removed when this is `true`.
+   *
+   * @default false
+   */
+  readonly shallow?: boolean
 }
 
 type InvalidJSONValue = bigint | Function | undefined | symbol
