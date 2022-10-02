@@ -6,7 +6,6 @@ test('Is deep by default on objects', (t) => {
 })
 
 test('Is deep by default on arrays', (t) => {
-  // eslint-disable-next-line no-magic-numbers
   t.deepEqual(safeJsonValue([0n]).value, [])
 })
 
@@ -23,12 +22,10 @@ test('Can be shallow on objects', (t) => {
 })
 
 test('Can be shallow on arrays', (t) => {
-  // eslint-disable-next-line no-magic-numbers
   const value = [0n]
   t.deepEqual(safeJsonValue(value, { shallow: true }).value, value)
 })
 
 test('Can be shallow on non-objects nor arrays', (t) => {
-  // eslint-disable-next-line no-magic-numbers
   t.is(safeJsonValue(0n, { shallow: true }).value, undefined)
 })

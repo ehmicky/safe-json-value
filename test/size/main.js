@@ -23,7 +23,6 @@ each(
     [],
     true,
     false,
-    // eslint-disable-next-line unicorn/no-null
     null,
     0,
     // eslint-disable-next-line no-magic-numbers
