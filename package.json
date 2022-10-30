@@ -51,7 +51,7 @@
     "normalize-exception": "^2.9.0"
   },
   "devDependencies": {
-    "@ehmicky/dev-tasks": "^1.0.96",
+    "@ehmicky/dev-tasks": "^1.0.97",
     "test-each": "^5.4.1"
   },
   "engines": {
