@@ -56,7 +56,8 @@ export const addSize = function ({
 const SKIP_MAX_SIZE = Number.POSITIVE_INFINITY
 
 // Default value for `maxSize` option.
-// Chosen based on v8 max string length, which is ~5e8.
+// Chosen based on v8 max string length, which is ~5e8, which is smaller than
+// SpiderMonkey (~1e9) and SquirrelFish (~2e9).
 export const DEFAULT_MAX_SIZE = 1e7
 
 const SIZED_TYPES = {
