@@ -1,3 +1,9 @@
+# 1.9.0
+
+## Features
+
+- Add browser support
+
 # 1.8.0
 
 ## Features
