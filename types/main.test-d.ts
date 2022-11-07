@@ -5,7 +5,7 @@ import {
   expectNotAssignable,
 } from 'tsd'
 
-import safeJsonValue, { Options, Change, Reason } from './main.js'
+import safeJsonValue, { Options, Change, Reason } from 'safe-json-value'
 
 const trueValue = true as const
 const arrayValue = [0 as const, trueValue]
