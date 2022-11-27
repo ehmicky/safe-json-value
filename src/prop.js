@@ -1,6 +1,6 @@
-import { safeGetProp } from './get.js'
+import { safeGetProp } from './get/main.js'
 import { omitInvalidKey } from './key.js'
-import { addSize } from './size.js'
+import { addSize } from './size/main.js'
 
 // Transform an object property or an array item
 export const transformProp = function ({
