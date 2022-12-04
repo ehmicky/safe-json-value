@@ -30,6 +30,7 @@ export interface Options {
 }
 
 type InvalidJSONValue = bigint | Function | undefined | symbol
+
 type ReturnValue<T, Shallow extends boolean> = T extends Array<infer ArrayItem>
   ? Array<Shallow extends true ? ArrayItem : ReturnValue<ArrayItem, Shallow>>
   : T extends InvalidJSONValue
@@ -49,6 +50,7 @@ type ReturnValue<T, Shallow extends boolean> = T extends Array<infer ArrayItem>
   : T
 
 type ReasonWithError = 'unsafeException' | 'unsafeGetter' | 'unsafeToJSON'
+
 type ReasonWithoutError =
   | 'descriptorNotConfigurable'
   | 'descriptorNotWritable'

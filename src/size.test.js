@@ -1,6 +1,7 @@
 import test from 'ava'
-import safeJsonValue from 'safe-json-value'
 import { each } from 'test-each'
+
+import safeJsonValue from 'safe-json-value'
 
 const strings = [
   'test',

@@ -1,6 +1,10 @@
 import { expectType, expectAssignable, expectNotAssignable } from 'tsd'
 
-import safeJsonValue, { Options, Change, Reason } from 'safe-json-value'
+import safeJsonValue, {
+  type Options,
+  type Change,
+  type Reason,
+} from 'safe-json-value'
 
 const trueValue = true as const
 const arrayValue = [0 as const, trueValue]
@@ -14,6 +18,7 @@ expectType<{ a?: (0 | true)[] } | undefined>(
   safeJsonValue({ a: arrayValue }).value,
 )
 const arrayWithProps: boolean[] & { prop?: boolean } = [true]
+// eslint-disable-next-line fp/no-mutation
 arrayWithProps.prop = true
 expectType<boolean[] | undefined>(safeJsonValue(arrayWithProps).value)
 expectType<{ a?: boolean[] } | undefined>(
@@ -29,7 +34,7 @@ const objWithToJSON = {
 expectType<true | undefined>(safeJsonValue(objWithToJSON).value)
 expectType<{ a?: true } | undefined>(safeJsonValue({ a: objWithToJSON }).value)
 expectType<{ a?: true } | undefined>(
-  safeJsonValue({ a: trueValue, [Symbol()]: trueValue }).value,
+  safeJsonValue({ a: trueValue, [Symbol('test')]: trueValue }).value,
 )
 expectType<undefined>(safeJsonValue(undefined).value)
 expectType<{ a?: true } | undefined>(
@@ -39,9 +44,9 @@ expectType<undefined>(safeJsonValue(0n).value)
 expectType<{ a?: true } | undefined>(
   safeJsonValue({ a: trueValue, b: 0n }).value,
 )
-expectType<undefined>(safeJsonValue(Symbol()).value)
+expectType<undefined>(safeJsonValue(Symbol('test')).value)
 expectType<{ a?: true } | undefined>(
-  safeJsonValue({ a: trueValue, b: Symbol() }).value,
+  safeJsonValue({ a: trueValue, b: Symbol('test') }).value,
 )
 expectType<undefined>(safeJsonValue(() => {}).value)
 expectType<{ a?: true } | undefined>(
@@ -50,7 +55,7 @@ expectType<{ a?: true } | undefined>(
 
 expectType<Change[]>(safeJsonValue(undefined).changes)
 const change = {
-  path: ['' as const, 0 as const, Symbol()],
+  path: ['' as const, 0 as const, Symbol('test')],
   oldValue: undefined,
   newValue: undefined,
   reason: 'unresolvedClass' as const,
@@ -58,6 +63,7 @@ const change = {
 expectAssignable<Change>(change)
 
 type unsafeExceptionChange = Change<'unsafeException'>
+
 const changeWithError = {
   ...change,
   reason: 'unsafeException',
