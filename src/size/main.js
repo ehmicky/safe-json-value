@@ -1,4 +1,4 @@
-import { safeGetChangeProp } from '../get/main.js'
+import { safeGetChangeProp } from '../get.js'
 
 // Apply `maxSize`, which omits values if they their JSON size would be too
 // high.

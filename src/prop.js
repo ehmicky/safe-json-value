@@ -1,4 +1,4 @@
-import { safeGetProp } from './get/main.js'
+import { safeGetProp } from './get.js'
 import { omitInvalidKey } from './key.js'
 import { addSize } from './size/main.js'
 

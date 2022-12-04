@@ -5,6 +5,40 @@ import { each } from 'test-each'
 each(
   [
     {
+      descriptor: { configurable: false, writable: true },
+      reason: 'descriptorNotConfigurable',
+    },
+    {
+      descriptor: { configurable: true, writable: false },
+      reason: 'descriptorNotWritable',
+    },
+  ],
+  ({ title }, { descriptor, reason }) => {
+    test(`Make properties configurable and writable | ${title}`, (t) => {
+      // eslint-disable-next-line fp/no-mutating-methods
+      const input = Object.defineProperty({}, 'prop', {
+        value: true,
+        enumerable: true,
+        ...descriptor,
+      })
+      const { value, changes } = safeJsonValue(input)
+      t.deepEqual(value, { prop: true })
+      t.deepEqual(Object.getOwnPropertyDescriptor(value, 'prop'), {
+        value: true,
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      })
+      t.deepEqual(changes, [
+        { path: ['prop'], oldValue: true, newValue: true, reason },
+      ])
+    })
+  },
+)
+
+each(
+  [
+    {
       input: {
         // eslint-disable-next-line fp/no-get-set
         get prop() {
@@ -89,6 +123,53 @@ test('Omit getters that throw', (t) => {
         newValue: undefined,
         reason: 'unsafeGetter',
         error,
+      },
+    ],
+  })
+})
+
+test('Resolve proxy get hooks', (t) => {
+  // eslint-disable-next-line fp/no-proxy
+  const input = new Proxy(
+    { prop: false },
+    {
+      get(...args) {
+        // Ensures the `value` returned by `safeJsonValue` is not a Proxy
+        // anymore
+        if (Reflect.get(...args)) {
+          throw new Error('test')
+        }
+
+        return true
+      },
+    },
+  )
+  t.deepEqual(safeJsonValue(input), {
+    value: { prop: true },
+    changes: [],
+  })
+})
+
+test('Omit proxy get hooks that throw', (t) => {
+  const error = new Error('test')
+  // eslint-disable-next-line fp/no-proxy
+  const input = new Proxy(
+    { prop: true },
+    {
+      get() {
+        throw error.message
+      },
+    },
+  )
+  t.deepEqual(safeJsonValue(input), {
+    value: {},
+    changes: [
+      {
+        path: ['prop'],
+        oldValue: undefined,
+        newValue: undefined,
+        error,
+        reason: 'unsafeGetter',
       },
     ],
   })

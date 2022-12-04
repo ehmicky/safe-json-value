@@ -1,4 +1,4 @@
-import { safeGetChangeProp } from './get/main.js'
+import { safeGetChangeProp } from './get.js'
 
 // Omit array properties that are not indices.
 //  - This mimics `JSON.stringify()` behavior
