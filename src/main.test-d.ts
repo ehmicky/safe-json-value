@@ -1,9 +1,4 @@
-import {
-  expectType,
-  expectError,
-  expectAssignable,
-  expectNotAssignable,
-} from 'tsd'
+import { expectType, expectAssignable, expectNotAssignable } from 'tsd'
 
 import safeJsonValue, { Options, Change, Reason } from 'safe-json-value'
 
@@ -95,22 +90,26 @@ expectNotAssignable<Reason>(true)
 
 safeJsonValue('', {})
 expectAssignable<Options>({})
-expectError(safeJsonValue('', true))
+// @ts-expect-error
+safeJsonValue('', true)
 expectNotAssignable<Options>(true)
 
-expectError(safeJsonValue('', { unknown: true }))
+// @ts-expect-error
+safeJsonValue('', { unknown: true })
 expectNotAssignable<Options>({ unknown: true })
 
 safeJsonValue('', { maxSize: 0 })
 expectAssignable<Options>({ maxSize: 0 })
 safeJsonValue('', { maxSize: Number.POSITIVE_INFINITY })
 expectAssignable<Options>({ maxSize: Number.POSITIVE_INFINITY })
-expectError(safeJsonValue('', { maxSize: '0' }))
+// @ts-expect-error
+safeJsonValue('', { maxSize: '0' })
 expectNotAssignable<Options>({ maxSize: '0' })
 
 safeJsonValue('', { shallow: true })
 expectAssignable<Options>({ shallow: true })
-expectError(safeJsonValue('', { shallow: 'true' }))
+// @ts-expect-error
+safeJsonValue('', { shallow: 'true' })
 expectNotAssignable<Options>({ shallow: 'true' })
 
 expectType<string | undefined>(safeJsonValue({ a: new Date() }).value?.a)
