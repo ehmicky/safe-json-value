@@ -62,22 +62,22 @@ const change = {
 }
 expectAssignable<Change>(change)
 
-type unsafeExceptionChange = Change<'unsafeException'>
+type UnsafeExceptionChange = Change<'unsafeException'>
 
 const changeWithError = {
   ...change,
   reason: 'unsafeException',
   error: new Error(''),
 }
-expectNotAssignable<unsafeExceptionChange>({
+expectNotAssignable<UnsafeExceptionChange>({
   ...change,
   reason: 'unsafeException',
 })
-expectNotAssignable<unsafeExceptionChange>({
+expectNotAssignable<UnsafeExceptionChange>({
   ...changeWithError,
   reason: 'unresolvedClass',
 })
-expectAssignable<unsafeExceptionChange>({
+expectAssignable<UnsafeExceptionChange>({
   ...changeWithError,
   reason: 'unsafeException',
 })
@@ -87,7 +87,7 @@ expectNotAssignable<Change>({ ...change, path: [true] })
 
 expectType<unknown>((change as Change).oldValue)
 expectType<unknown>((change as Change).newValue)
-expectType<Error>((changeWithError as unsafeExceptionChange).error)
+expectType<Error>((changeWithError as UnsafeExceptionChange).error)
 
 expectType<Reason>((change as Change).reason)
 expectAssignable<Reason>('unresolvedClass')

@@ -29,15 +29,18 @@ export interface Options {
   readonly shallow?: boolean
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 type InvalidJSONValue = bigint | Function | undefined | symbol
 
-type ReturnValue<T, Shallow extends boolean> = T extends Array<infer ArrayItem>
-  ? Array<Shallow extends true ? ArrayItem : ReturnValue<ArrayItem, Shallow>>
+type ReturnValue<T, Shallow extends boolean> = T extends (infer ArrayItem)[]
+  ? Shallow extends true
+    ? ArrayItem[]
+    : ReturnValue<ArrayItem, Shallow>[]
   : T extends InvalidJSONValue
   ? undefined
   : T extends Date
   ? string
-  : T extends { toJSON(): any }
+  : T extends { toJSON: () => unknown }
   ? ReturnType<T['toJSON']>
   : T extends object
   ? {
