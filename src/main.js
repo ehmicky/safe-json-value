@@ -1,7 +1,7 @@
 import { checkCycleThenRecurse } from './cycle.js'
 import { addNotArrayIndexChanges } from './indices.js'
 import { addSize, DEFAULT_MAX_SIZE } from './size.js'
-import { callToJSON } from './to_json/main.js'
+import { callToJSON } from './to_json.js'
 import { omitInvalidTypes } from './type.js'
 import { handleUnsafeException } from './uncaught.js'
 

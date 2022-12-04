@@ -1,6 +1,6 @@
 import normalizeException from 'normalize-exception'
 
-import { isObject } from '../is_object.js'
+import { isObject } from './is_object.js'
 
 // Replace `object.toJSON()` by its return value.
 //  - Including for native classes like `Date`
