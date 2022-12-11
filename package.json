@@ -1,6 +1,6 @@
 {
   "name": "safe-json-value",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "type": "module",
   "exports": {
     "types": "./build/src/main.d.ts",
