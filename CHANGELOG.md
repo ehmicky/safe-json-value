@@ -1,3 +1,9 @@
+# 1.11.0
+
+## Features
+
+- Improve TypeScript types
+
 # 1.10.0
 
 ## Features
