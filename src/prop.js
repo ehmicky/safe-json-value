@@ -3,7 +3,7 @@ import { omitInvalidKey } from './key.js'
 import { addSize } from './size.js'
 
 // Transform an object property or an array item
-export const transformProp = function ({
+export const transformProp = ({
   parent,
   changes,
   ancestors,
@@ -14,7 +14,7 @@ export const transformProp = function ({
   empty,
   size,
   recurse,
-}) {
+}) => {
   const propPath = [...path, key]
   const { size: sizeA, stop } = addSize({
     type,
@@ -45,7 +45,7 @@ export const transformProp = function ({
 }
 
 // Recurse over an object property or array index
-const transformPropValue = function ({
+const transformPropValue = ({
   parent,
   key,
   changes,
@@ -54,7 +54,7 @@ const transformPropValue = function ({
   size,
   maxSize,
   recurse,
-}) {
+}) => {
   const { prop, safe } = safeGetProp({ parent, key, changes, path })
 
   if (!safe) {

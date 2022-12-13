@@ -11,7 +11,7 @@ import { isObject } from './is_object.js'
 // If `object.toJSON()` throws, `object` is omitted.
 //  - As opposed to just ignoring `toJSON()` because this would mean it could
 //    have different types/shapes depending on whether `toJSON()` throws
-export const callToJSON = function (value, changes, path) {
+export const callToJSON = (value, changes, path) => {
   if (!hasToJSON(value)) {
     return value
   }
@@ -36,14 +36,11 @@ export const callToJSON = function (value, changes, path) {
   }
 }
 
-const hasToJSON = function (value) {
-  return (
-    isObject(value) &&
-    'toJSON' in value &&
-    typeof value.toJSON === 'function' &&
-    !TO_JSON_RECURSION.has(value)
-  )
-}
+const hasToJSON = (value) =>
+  isObject(value) &&
+  'toJSON' in value &&
+  typeof value.toJSON === 'function' &&
+  !TO_JSON_RECURSION.has(value)
 
 // We handle the common use case of an `object.toJSON()` calling this library
 // itself.
@@ -52,7 +49,7 @@ const hasToJSON = function (value) {
 //    library (inside `object.toJSON()`), as reference (not copy)
 //  - We do not set a symbol property instead, since this might change how
 //    user-defined `object.toJSON()` behaves
-const triggerToJSON = function (object) {
+const triggerToJSON = (object) => {
   TO_JSON_RECURSION.add(object)
 
   try {

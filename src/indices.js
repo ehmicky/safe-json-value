@@ -5,7 +5,7 @@ import { safeGetChangeProp } from './get.js'
 //  - Regardless of whether they are symbols and|or non-enumerable
 // Uses imperative logic for performance reasons.
 /* eslint-disable fp/no-loops, max-depth */
-export const addNotArrayIndexChanges = function (array, changes, path) {
+export const addNotArrayIndexChanges = (array, changes, path) => {
   if (!Array.isArray(array)) {
     return
   }
@@ -27,13 +27,11 @@ export const addNotArrayIndexChanges = function (array, changes, path) {
 
 // `Array.length` is omitted by `JSON.stringify()`. But since every array has
 // this property, we do not add it to `changes`.
-const getArrayProps = function (length) {
+const getArrayProps = (length) => {
   const indices = Array.from({ length }, getArrayIndex)
   const arrayProps = new Set(indices)
   arrayProps.add('length')
   return arrayProps
 }
 
-const getArrayIndex = function (_, index) {
-  return String(index)
-}
+const getArrayIndex = (_, index) => String(index)

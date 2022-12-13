@@ -1,7 +1,7 @@
 // Omit properties which are ignored by `JSON.stringify()`:
 //  - Symbol keys
 //  - Non-enumerable properties, except in arrays
-export const omitInvalidKey = function ({ parent, key, prop, changes, path }) {
+export const omitInvalidKey = ({ parent, key, prop, changes, path }) => {
   if (typeof key === 'symbol') {
     changes.push({
       path,

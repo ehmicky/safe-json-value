@@ -10,7 +10,7 @@ each(
     { descriptor: { value: true, writable: true }, oldValue: true },
     {
       descriptor: {
-        get() {
+        get: () => {
           throw new Error('test')
         },
       },

@@ -109,7 +109,7 @@ test('Omit getters that throw', (t) => {
   const error = new Error('test')
   // eslint-disable-next-line fp/no-mutating-methods
   const input = Object.defineProperty({}, 'prop', {
-    get() {
+    get: () => {
       throw error.message
     },
     enumerable: true,
@@ -134,7 +134,7 @@ test('Resolve proxy get hooks', (t) => {
   const input = new Proxy(
     { prop: false },
     {
-      get(...args) {
+      get: (...args) => {
         // Ensures the `value` returned by `safeJsonValue` is not a Proxy
         // anymore
         if (Reflect.get(...args)) {
@@ -157,7 +157,7 @@ test('Omit proxy get hooks that throw', (t) => {
   const input = new Proxy(
     { prop: true },
     {
-      get() {
+      get: () => {
         throw error.message
       },
     },

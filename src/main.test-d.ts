@@ -27,9 +27,7 @@ expectType<{ a?: boolean[] } | undefined>(
 expectType<string | undefined>(safeJsonValue(new Date()).value)
 expectType<{ a?: string } | undefined>(safeJsonValue({ a: new Date() }).value)
 const objWithToJSON = {
-  toJSON(): true {
-    return true
-  },
+  toJSON: (): true => true,
 }
 expectType<true | undefined>(safeJsonValue(objWithToJSON).value)
 expectType<{ a?: true } | undefined>(safeJsonValue({ a: objWithToJSON }).value)
@@ -50,7 +48,7 @@ expectType<{ a?: true } | undefined>(
 )
 expectType<undefined>(safeJsonValue(() => {}).value)
 expectType<{ a?: true } | undefined>(
-  safeJsonValue({ a: trueValue, b() {} }).value,
+  safeJsonValue({ a: trueValue, b: () => {} }).value,
 )
 
 expectType<Change[]>(safeJsonValue(undefined).changes)

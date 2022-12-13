@@ -3,7 +3,7 @@ import { isObject } from './is_object.js'
 import { recurseObject } from './object.js'
 
 // We omit cycles since `JSON.stringify()` throws on them.
-export const checkCycleThenRecurse = function ({
+export const checkCycleThenRecurse = ({
   value,
   changes,
   ancestors,
@@ -12,7 +12,7 @@ export const checkCycleThenRecurse = function ({
   newSize,
   maxSize,
   recurse,
-}) {
+}) => {
   if (!isObject(value)) {
     return { value, size: newSize }
   }
@@ -41,7 +41,7 @@ export const checkCycleThenRecurse = function ({
   return { value: valueA, size: newSizeA }
 }
 
-const recurseValue = function ({
+const recurseValue = ({
   value,
   changes,
   ancestors,
@@ -49,8 +49,8 @@ const recurseValue = function ({
   size,
   maxSize,
   recurse,
-}) {
-  return Array.isArray(value)
+}) =>
+  Array.isArray(value)
     ? recurseArray({
         array: value,
         changes,
@@ -69,4 +69,3 @@ const recurseValue = function ({
         maxSize,
         recurse,
       })
-}

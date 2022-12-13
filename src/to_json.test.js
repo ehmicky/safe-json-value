@@ -5,9 +5,7 @@ import safeJsonValue from 'safe-json-value'
 
 test('Calls object.toJSON()', (t) => {
   const input = {
-    toJSON() {
-      return true
-    },
+    toJSON: () => true,
   }
   const { value, changes } = safeJsonValue(input)
   t.true(value)
@@ -17,7 +15,7 @@ test('Calls object.toJSON()', (t) => {
 })
 
 test('Handles object.toJSON() returning undefined', (t) => {
-  const input = { prop: { toJSON() {} } }
+  const input = { prop: { toJSON: () => {} } }
   const { value, changes } = safeJsonValue(input)
   t.deepEqual(value, {})
   t.deepEqual(changes, [
@@ -39,7 +37,7 @@ test('Handles object.toJSON() returning undefined', (t) => {
 test('Handles object.toJSON() that throws', (t) => {
   const error = new Error('test')
   const input = {
-    toJSON() {
+    toJSON: () => {
       throw error.message
     },
   }
@@ -80,7 +78,7 @@ test('Handles dates', (t) => {
 })
 
 test('Does not call object.toJSON() recursively', (t) => {
-  const newValue = { toJSON() {}, prop: true }
+  const newValue = { toJSON: () => {}, prop: true }
   const input = { toJSON: () => newValue }
   const { value, changes } = safeJsonValue(input)
   t.deepEqual(value, { prop: true })
@@ -99,9 +97,7 @@ const inputCallParent = {
   prop: {
     one: true,
     two: undefined,
-    toJSON() {
-      return safeJsonValue(inputCallParent).value
-    },
+    toJSON: () => safeJsonValue(inputCallParent).value,
   },
 }
 
@@ -109,18 +105,14 @@ const inputCallSelfCopy = {
   prop: {
     one: true,
     two: undefined,
-    toJSON() {
-      return safeJsonValue({ ...inputCallSelfCopy }).value
-    },
+    toJSON: () => safeJsonValue({ ...inputCallSelfCopy }).value,
   },
 }
 
 const inputCallSelfRef = {
   one: true,
   two: undefined,
-  toJSON() {
-    return safeJsonValue(inputCallSelfRef).value
-  },
+  toJSON: () => safeJsonValue(inputCallSelfRef).value,
 }
 
 each([inputCallParent, inputCallSelfCopy], ({ title }, input) => {

@@ -3,9 +3,7 @@ import { each } from 'test-each'
 
 import safeJsonValue from 'safe-json-value'
 
-const isProp = function (key) {
-  return key.startsWith('prop')
-}
+const isProp = (key) => key.startsWith('prop')
 
 const getInfiniteGetter = () => ({
   // eslint-disable-next-line fp/no-get-set
@@ -16,15 +14,11 @@ const getInfiniteGetter = () => ({
 
 const getInfiniteToJSON = () => ({
   prop: true,
-  toJSON() {
-    return { prop: getInfiniteToJSON() }
-  },
+  toJSON: () => ({ prop: getInfiniteToJSON() }),
 })
 
 const getInfiniteToJSONTwo = () => ({
-  toJSON() {
-    return { prop: true, propTwo: getInfiniteToJSONTwo() }
-  },
+  toJSON: () => ({ prop: true, propTwo: getInfiniteToJSONTwo() }),
 })
 
 each(

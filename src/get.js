@@ -1,7 +1,7 @@
 import normalizeException from 'normalize-exception'
 
 // Same as `safeGetProp()` but without any `changes`
-export const safeGetChangeProp = function ({ parent, key }) {
+export const safeGetChangeProp = ({ parent, key }) => {
   try {
     return parent[key]
   } catch {}
@@ -11,7 +11,7 @@ export const safeGetChangeProp = function ({ parent, key }) {
 // If it throws, the property is omitted.
 // It is not possible to detect that a proxy is being used, except when it
 // throws, so we cannot add this to the `changes`.
-export const safeGetProp = function ({ parent, key, changes, path }) {
+export const safeGetProp = ({ parent, key, changes, path }) => {
   try {
     const prop = getProp({ parent, key, changes, path })
     return { prop, safe: true }
@@ -29,7 +29,7 @@ export const safeGetProp = function ({ parent, key, changes, path }) {
 
 // The descriptor is retrieved first in case there is a getter or proxy hook
 // that modifies `parent[key]`
-const getProp = function ({ parent, key, changes, path }) {
+const getProp = ({ parent, key, changes, path }) => {
   const descriptor = Object.getOwnPropertyDescriptor(parent, key)
   const prop = parent[key]
   addGetterChange({ changes, path, prop, descriptor })
@@ -38,12 +38,7 @@ const getProp = function ({ parent, key, changes, path }) {
 }
 
 // When `parent[key]` was a getter and|or setter
-const addGetterChange = function ({
-  changes,
-  path,
-  prop,
-  descriptor: { get, set },
-}) {
+const addGetterChange = ({ changes, path, prop, descriptor: { get, set } }) => {
   if (get !== undefined || set !== undefined) {
     changes.push({
       path,
@@ -55,12 +50,12 @@ const addGetterChange = function ({
 }
 
 // We convert non-writable|configurable properties to writable|configurable
-const addDescriptorChange = function ({
+const addDescriptorChange = ({
   changes,
   path,
   prop,
   descriptor: { writable, configurable },
-}) {
+}) => {
   if (writable === false) {
     changes.push({
       path,

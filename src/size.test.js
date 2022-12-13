@@ -170,7 +170,7 @@ each(
     {
       // eslint-disable-next-line fp/no-mutating-methods
       input: Object.defineProperty({}, 'prop', {
-        get() {
+        get: () => {
           throw error
         },
         enumerable: true,

@@ -9,7 +9,7 @@ import { transformProp } from './prop.js'
 // Uses imperative logic for performance reasons.
 /* eslint-disable fp/no-let, fp/no-loops, fp/no-mutation,
    fp/no-mutating-methods, max-depth */
-export const recurseArray = function ({
+export const recurseArray = ({
   array,
   changes,
   ancestors,
@@ -17,7 +17,7 @@ export const recurseArray = function ({
   size,
   maxSize,
   recurse,
-}) {
+}) => {
   const newArray = []
 
   let state = { empty: true, size }

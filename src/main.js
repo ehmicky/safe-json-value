@@ -11,10 +11,10 @@ import { handleUnsafeException } from './uncaught.js'
 //     - I.e. the result is lossy
 //  - Canonicalizing the value
 //  - Supporting other formats than JSON
-export default function safeJsonValue(
+const safeJsonValue = (
   value,
   { maxSize = DEFAULT_MAX_SIZE, shallow = false } = {},
-) {
+) => {
   const changes = []
   const ancestors = new Set([])
   const { value: newValue } = transformValue({
@@ -29,10 +29,12 @@ export default function safeJsonValue(
   return { value: newValue, changes }
 }
 
+export default safeJsonValue
+
 // The final top-level return value:
 //  - Might be `undefined`
 //  - Is not serialized to a string
-const transformValue = function ({
+const transformValue = ({
   value,
   changes,
   ancestors,
@@ -40,7 +42,7 @@ const transformValue = function ({
   size,
   maxSize,
   shallow,
-}) {
+}) => {
   try {
     const valueA = callToJSON(value, changes, path)
     const valueB = omitInvalidTypes(valueA, changes, path)
@@ -70,7 +72,7 @@ const transformValue = function ({
 //     - This favors maximizing the number of fields within the allowed
 //       `maxSize`
 //  - This is easier to implement
-const checkSizeThenRecurse = function ({
+const checkSizeThenRecurse = ({
   value,
   changes,
   ancestors,
@@ -78,7 +80,7 @@ const checkSizeThenRecurse = function ({
   size,
   maxSize,
   shallow,
-}) {
+}) => {
   const { size: newSize, stop } = addSize({
     type: 'value',
     size,
@@ -105,6 +107,4 @@ const checkSizeThenRecurse = function ({
   })
 }
 
-const identity = function ({ value, changes }) {
-  return { value, changes }
-}
+const identity = ({ value, changes }) => ({ value, changes })

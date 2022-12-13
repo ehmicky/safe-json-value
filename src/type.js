@@ -2,7 +2,7 @@
 //  - bigints would throw
 //  - `NaN` and `[-]Infinity` would be transformed to `null`
 //  - `undefined`, functions and symbols would be omitted
-export const omitInvalidTypes = function (value, changes, path) {
+export const omitInvalidTypes = (value, changes, path) => {
   const reason = getInvalidTypeReason(value)
 
   if (reason === undefined) {
@@ -12,7 +12,7 @@ export const omitInvalidTypes = function (value, changes, path) {
   changes.push({ path, oldValue: value, newValue: undefined, reason })
 }
 
-const getInvalidTypeReason = function (value) {
+const getInvalidTypeReason = (value) => {
   const type = typeof value
   const reason = INVALID_TYPES[type]
 

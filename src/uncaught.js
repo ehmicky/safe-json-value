@@ -13,13 +13,13 @@ import normalizeException from 'normalize-exception'
 //  - When a `get` method or Proxy hook (not `object.toJSON()`)
 //  - Calls this library itself
 //  - Passing a reference (not a copy) to itself or to an ancestor
-export const handleUnsafeException = function ({
+export const handleUnsafeException = ({
   value,
   changes,
   path,
   error,
   size,
-}) {
+}) => {
   changes.push({
     path,
     oldValue: value,

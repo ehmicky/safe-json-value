@@ -231,7 +231,7 @@ JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
 const input = {
   one: true,
   two: {
-    toJSON() {
+    toJSON: () => {
       throw new Error('example')
     },
   },
@@ -263,7 +263,7 @@ JSON.stringify(safeJsonValue(input).value) // '{"one":true}"
 const input = new Proxy(
   { one: false },
   {
-    get() {
+    get: () => {
       throw new Error('example')
     },
   },
@@ -343,7 +343,7 @@ prevent any unexpected output.
 <!-- eslint-disable no-unused-expressions -->
 
 ```js
-const input = { one: true, two() {} }
+const input = { one: true, two: () => {} }
 JSON.parse(JSON.stringify(input)) // { one: true }
 safeJsonValue(input).value // { one: true }
 ```
@@ -411,9 +411,7 @@ prevent any unexpected output.
 
 ```js
 const input = {
-  toJSON() {
-    return { one: true }
-  },
+  toJSON: () => ({ one: true }),
 }
 JSON.parse(JSON.stringify(input)) // { one: true }
 safeJsonValue(input).value // { one: true }
@@ -461,9 +459,7 @@ safeJsonValue(input).value // { one: true }
 const input = new Proxy(
   { one: false },
   {
-    get() {
-      return true
-    },
+    get: () => true,
   },
 )
 JSON.parse(JSON.stringify(input)) // { one: true }

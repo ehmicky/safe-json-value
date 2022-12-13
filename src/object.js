@@ -10,7 +10,7 @@ import { transformProp } from './prop.js'
 //  - This preserves the object properties order
 // Uses imperative logic for performance reasons.
 /* eslint-disable fp/no-let, fp/no-loops, fp/no-mutation, max-depth */
-export const recurseObject = function ({
+export const recurseObject = ({
   object,
   changes,
   ancestors,
@@ -18,7 +18,7 @@ export const recurseObject = function ({
   size,
   maxSize,
   recurse,
-}) {
+}) => {
   const newObject = getNewObject(object)
   let state = { empty: true, size }
 
@@ -49,14 +49,13 @@ export const recurseObject = function ({
 // When the object has a `null` prototype, we keep it.
 //  - This reduces the number of changes
 //  - Also, `JSON.stringify()` handles those
-const getNewObject = function (object) {
-  return Object.getPrototypeOf(object) === null ? Object.create(null) : {}
-}
+const getNewObject = (object) =>
+  Object.getPrototypeOf(object) === null ? Object.create(null) : {}
 
 // Inherited properties are omitted.
 // Therefore, classes are converted to plain objects.
 //  - This mimics `JSON.stringify()` behavior
-const addClassChange = function ({ object, newObject, changes, path }) {
+const addClassChange = ({ object, newObject, changes, path }) => {
   if (!isPlainObj(object)) {
     changes.push({
       path,

@@ -23,14 +23,7 @@ import { safeGetChangeProp } from './get.js'
 // This is applied incrementally, in a depth-first manner, so that omitted
 // fields (due to being over `maxSize`) and their children are not processed
 // at all, for performance reason.
-export const addSize = function ({
-  type,
-  size,
-  maxSize,
-  changes,
-  path,
-  context,
-}) {
+export const addSize = ({ type, size, maxSize, changes, path, context }) => {
   if (maxSize === SKIP_MAX_SIZE) {
     return { size, stop: false }
   }
@@ -62,7 +55,7 @@ export const DEFAULT_MAX_SIZE = 1e7
 
 const SIZED_TYPES = {
   value: {
-    getSize(value) {
+    getSize: (value) => {
       if (value === undefined) {
         return 0
       }
@@ -71,20 +64,15 @@ const SIZED_TYPES = {
         ? 2
         : getJsonLength(value)
     },
-    getOldValue(value) {
-      return value
-    },
+    getOldValue: (value) => value,
   },
   arrayItem: {
-    getSize({ empty }) {
-      return empty ? 0 : 1
-    },
+    getSize: ({ empty }) => (empty ? 0 : 1),
     getOldValue: safeGetChangeProp,
   },
   objectProp: {
-    getSize({ key, empty }) {
-      return typeof key === 'symbol' ? 0 : getJsonLength(key) + (empty ? 1 : 2)
-    },
+    getSize: ({ key, empty }) =>
+      typeof key === 'symbol' ? 0 : getJsonLength(key) + (empty ? 1 : 2),
     getOldValue: safeGetChangeProp,
   },
 }
@@ -97,7 +85,7 @@ const SIZED_TYPES = {
 // We use the character length instead of the UTF-8 bytes length:
 //  - This is less proper
 //  - However, this is much faster and is good enough for this specific purpose
-const getJsonLength = function (value) {
+const getJsonLength = (value) => {
   try {
     return JSON.stringify(value).length
   } catch {
