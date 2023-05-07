@@ -1,3 +1,9 @@
+# 2.0.1
+
+## Dependencies
+
+- Upgrade internal dependencies
+
 # 2.0.0
 
 ## Breaking changes
