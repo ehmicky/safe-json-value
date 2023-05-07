@@ -1,10 +1,10 @@
-import { expectType, expectAssignable, expectNotAssignable } from 'tsd'
-
 import safeJsonValue, {
   type Options,
   type Change,
   type Reason,
 } from 'safe-json-value'
+import { expectType, expectAssignable, expectNotAssignable } from 'tsd'
+
 
 const trueValue = true as const
 const arrayValue = [0 as const, trueValue]

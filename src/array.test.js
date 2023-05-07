@@ -1,5 +1,4 @@
 import test from 'ava'
-
 import safeJsonValue from 'safe-json-value'
 
 test('Omit removed properties', (t) => {
