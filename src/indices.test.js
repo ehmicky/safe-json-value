@@ -2,7 +2,6 @@ import test from 'ava'
 import safeJsonValue from 'safe-json-value'
 import { each } from 'test-each'
 
-
 each(
   ['prop', Symbol('test')],
   [true, false],

@@ -2,7 +2,6 @@ import test from 'ava'
 import safeJsonValue from 'safe-json-value'
 import { each } from 'test-each'
 
-
 const isProp = (key) => key.startsWith('prop')
 
 const getInfiniteGetter = () => ({

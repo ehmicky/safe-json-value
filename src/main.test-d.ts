@@ -5,7 +5,6 @@ import safeJsonValue, {
 } from 'safe-json-value'
 import { expectType, expectAssignable, expectNotAssignable } from 'tsd'
 
-
 const trueValue = true as const
 const arrayValue = [0 as const, trueValue]
 expectType<true | undefined>(safeJsonValue(trueValue).value)

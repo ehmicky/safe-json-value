@@ -2,7 +2,6 @@ import test from 'ava'
 import safeJsonValue from 'safe-json-value'
 import { each } from 'test-each'
 
-
 test('Calls object.toJSON()', (t) => {
   const input = {
     toJSON: () => true,
