@@ -1,4 +1,5 @@
 import test from 'ava'
+
 import safeJsonValue from 'safe-json-value'
 
 test('Is deep by default on objects', (t) => {
