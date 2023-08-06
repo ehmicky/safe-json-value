@@ -42,7 +42,10 @@
   ],
   "license": "Apache-2.0",
   "homepage": "https://www.github.com/ehmicky/safe-json-value",
-  "repository": "ehmicky/safe-json-value",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ehmicky/safe-json-value.git"
+  },
   "bugs": {
     "url": "https://github.com/ehmicky/safe-json-value/issues"
   },
