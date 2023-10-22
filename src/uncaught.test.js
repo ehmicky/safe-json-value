@@ -32,7 +32,7 @@ each(
       const input = getInput()
       const { value, changes } = safeJsonValue(input)
       t.true('prop' in value)
-      const lastChange = changes[changes.length - 1]
+      const lastChange = changes.at(-1)
       t.true(Array.isArray(lastChange.path) && lastChange.path.every(isProp))
       t.is(typeof lastChange.oldValue, 'object')
       t.is(lastChange.newValue, undefined)
