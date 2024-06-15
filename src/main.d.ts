@@ -37,20 +37,20 @@ type ReturnValue<T, Shallow extends boolean> = T extends (infer ArrayItem)[]
     ? ArrayItem[]
     : ReturnValue<ArrayItem, Shallow>[]
   : T extends InvalidJSONValue
-  ? undefined
-  : T extends Date
-  ? string
-  : T extends { toJSON: () => unknown }
-  ? ReturnType<T['toJSON']>
-  : T extends object
-  ? {
-      [key in keyof T as T[key] extends InvalidJSONValue
-        ? never
-        : Exclude<key, symbol>]?: Shallow extends true
-        ? T[key]
-        : ReturnValue<T[key], Shallow>
-    }
-  : T
+    ? undefined
+    : T extends Date
+      ? string
+      : T extends { toJSON: () => unknown }
+        ? ReturnType<T['toJSON']>
+        : T extends object
+          ? {
+              [key in keyof T as T[key] extends InvalidJSONValue
+                ? never
+                : Exclude<key, symbol>]?: Shallow extends true
+                ? T[key]
+                : ReturnValue<T[key], Shallow>
+            }
+          : T
 
 type ReasonWithError = 'unsafeException' | 'unsafeGetter' | 'unsafeToJSON'
 
