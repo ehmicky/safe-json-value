@@ -7,8 +7,7 @@ import { transformProp } from './prop.js'
 // Omitted items are filtered out.
 //  - Otherwise, `JSON.stringify()` would transform them to `null`
 // Uses imperative logic for performance reasons.
-/* eslint-disable fp/no-let, fp/no-loops, fp/no-mutation,
-   fp/no-mutating-methods, max-depth */
+/* eslint-disable fp/no-let, fp/no-loops, fp/no-mutation, max-depth */
 export const recurseArray = ({
   array,
   changes,
@@ -43,5 +42,4 @@ export const recurseArray = ({
 
   return { value: newArray, size: state.size }
 }
-/* eslint-enable fp/no-let, fp/no-loops, fp/no-mutation,
-   fp/no-mutating-methods, max-depth */
+/* eslint-enable fp/no-let, fp/no-loops, fp/no-mutation, max-depth */

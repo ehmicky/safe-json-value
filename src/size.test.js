@@ -168,7 +168,6 @@ each(
       change: { reason: 'ignoredUndefined' },
     },
     {
-      // eslint-disable-next-line fp/no-mutating-methods
       input: Object.defineProperty({}, 'prop', {
         get: () => {
           throw error

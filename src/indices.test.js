@@ -20,7 +20,6 @@ each(
   // eslint-disable-next-line max-params
   ({ title }, key, enumerable, { descriptor, oldValue }) => {
     test(`Omit array properties that are not indices | ${title}`, (t) => {
-      // eslint-disable-next-line fp/no-mutating-methods
       const array = Object.defineProperty([true], key, {
         ...descriptor,
         enumerable,
