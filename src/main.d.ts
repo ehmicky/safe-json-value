@@ -109,7 +109,7 @@ export type Change<ReasonValue extends Reason = Reason> = {
        */
       error: Error
     }
-  : {})
+  : object)
 
 /**
  * Makes `value` JSON-safe by:
@@ -139,7 +139,7 @@ export type Change<ReasonValue extends Reason = Reason> = {
  * // ]
  * ```
  */
-export default function safeJsonValue<T, OptionsArg extends Options = {}>(
+export default function safeJsonValue<T, OptionsArg extends Options = object>(
   value: T,
   options?: OptionsArg,
 ): {
