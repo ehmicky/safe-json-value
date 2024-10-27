@@ -29,7 +29,7 @@ export interface Options {
   readonly shallow?: boolean
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 type InvalidJSONValue = bigint | Function | undefined | symbol
 
 type ReturnValue<T, Shallow extends boolean> = T extends (infer ArrayItem)[]
