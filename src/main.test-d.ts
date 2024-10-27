@@ -10,6 +10,7 @@ const trueValue = true as const
 const arrayValue = [0 as const, trueValue]
 expectType<true | undefined>(safeJsonValue(trueValue).value)
 expectType<never[] | undefined>(safeJsonValue([]).value)
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 expectType<{} | undefined>(safeJsonValue({}).value)
 expectType<(0 | true)[] | undefined>(safeJsonValue(arrayValue).value)
 expectType<{ a?: true } | undefined>(safeJsonValue({ a: trueValue }).value)
