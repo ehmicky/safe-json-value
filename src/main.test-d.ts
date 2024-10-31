@@ -1,8 +1,8 @@
-import { expectType, expectAssignable, expectNotAssignable } from 'tsd'
+import { expectAssignable, expectNotAssignable, expectType } from 'tsd'
 
 import safeJsonValue, {
-  type Options,
   type Change,
+  type Options,
   type Reason,
 } from 'safe-json-value'
 
