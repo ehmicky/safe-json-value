@@ -57,6 +57,7 @@ const getNewObject = (object) =>
 //  - This mimics `JSON.stringify()` behavior
 const addClassChange = ({ object, newObject, changes, path }) => {
   if (!isPlainObj(object)) {
+    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: object,

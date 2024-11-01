@@ -18,6 +18,7 @@ export const callToJSON = (value, changes, path) => {
 
   try {
     const toJSONResult = triggerToJSON(value)
+    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: value,
@@ -26,6 +27,7 @@ export const callToJSON = (value, changes, path) => {
     })
     return toJSONResult
   } catch (error) {
+    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: value,

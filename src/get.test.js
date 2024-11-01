@@ -16,6 +16,7 @@ each(
   ],
   ({ title }, { descriptor, reason }) => {
     test(`Make properties configurable and writable | ${title}`, (t) => {
+      // eslint-disable-next-line fp/no-mutating-methods
       const input = Object.defineProperty({}, 'prop', {
         value: true,
         enumerable: true,
@@ -60,7 +61,7 @@ each(
       input: {
         // eslint-disable-next-line fp/no-get-set
         get prop() {
-          // eslint-disable-next-line fp/no-this
+          // eslint-disable-next-line fp/no-mutating-methods, fp/no-this
           Object.defineProperty(this, 'prop', {
             value: true,
             enumerable: true,
@@ -106,6 +107,7 @@ test('Resolve setters without getters', (t) => {
 
 test('Omit getters that throw', (t) => {
   const error = new Error('test')
+  // eslint-disable-next-line fp/no-mutating-methods
   const input = Object.defineProperty({}, 'prop', {
     get: () => {
       throw error.message

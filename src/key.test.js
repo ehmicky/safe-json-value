@@ -19,6 +19,7 @@ each(
       ],
     },
     {
+      // eslint-disable-next-line fp/no-mutating-methods
       input: Object.defineProperty({}, 'prop', {
         value: true,
         enumerable: false,
@@ -36,6 +37,7 @@ each(
       ],
     },
     {
+      // eslint-disable-next-line fp/no-mutating-methods
       input: Object.defineProperty([], '0', {
         value: true,
         enumerable: false,

@@ -16,6 +16,7 @@ export const safeGetProp = ({ parent, key, changes, path }) => {
     const prop = getProp({ parent, key, changes, path })
     return { prop, safe: true }
   } catch (error) {
+    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: undefined,
@@ -40,6 +41,7 @@ const getProp = ({ parent, key, changes, path }) => {
 // When `parent[key]` was a getter and|or setter
 const addGetterChange = ({ changes, path, prop, descriptor: { get, set } }) => {
   if (get !== undefined || set !== undefined) {
+    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: get,
@@ -57,6 +59,7 @@ const addDescriptorChange = ({
   descriptor: { writable, configurable },
 }) => {
   if (writable === false) {
+    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: prop,
@@ -66,6 +69,7 @@ const addDescriptorChange = ({
   }
 
   if (configurable === false) {
+    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: prop,

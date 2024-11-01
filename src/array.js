@@ -36,6 +36,7 @@ export const recurseArray = ({
     })
 
     if (state.value !== undefined) {
+      // eslint-disable-next-line fp/no-mutating-methods
       newArray.push(state.value)
     }
   }

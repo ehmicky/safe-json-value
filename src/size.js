@@ -36,6 +36,7 @@ export const addSize = ({ type, size, maxSize, changes, path, context }) => {
     return { size: newSize, stop }
   }
 
+  // eslint-disable-next-line fp/no-mutating-methods
   changes.push({
     path,
     oldValue: getOldValue(context),

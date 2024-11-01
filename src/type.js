@@ -9,6 +9,7 @@ export const omitInvalidTypes = (value, changes, path) => {
     return value
   }
 
+  // eslint-disable-next-line fp/no-mutating-methods
   changes.push({ path, oldValue: value, newValue: undefined, reason })
 }
 

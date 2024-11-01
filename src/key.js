@@ -3,6 +3,7 @@
 //  - Non-enumerable properties, except in arrays
 export const omitInvalidKey = ({ parent, key, prop, changes, path }) => {
   if (typeof key === 'symbol') {
+    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: prop,
@@ -13,6 +14,7 @@ export const omitInvalidKey = ({ parent, key, prop, changes, path }) => {
   }
 
   if (!isEnum.call(parent, key) && !Array.isArray(parent)) {
+    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: prop,

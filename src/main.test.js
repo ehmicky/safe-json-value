@@ -12,6 +12,7 @@ test('Is deep by default on arrays', (t) => {
 
 test('Can be shallow on objects', (t) => {
   const value = { one: 0n }
+  // eslint-disable-next-line fp/no-mutating-methods
   Object.defineProperty(value, 'two', {
     value: true,
     enumerable: false,

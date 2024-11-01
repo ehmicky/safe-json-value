@@ -14,6 +14,7 @@ export const addNotArrayIndexChanges = (array, changes, path) => {
 
   for (const key of Reflect.ownKeys(array)) {
     if (!arrayProps.has(key)) {
+      // eslint-disable-next-line fp/no-mutating-methods
       changes.push({
         path: [...path, key],
         oldValue: safeGetChangeProp({ parent: array, key }),

@@ -18,6 +18,7 @@ export const checkCycleThenRecurse = ({
   }
 
   if (ancestors.has(value)) {
+    // eslint-disable-next-line fp/no-mutating-methods
     changes.push({
       path,
       oldValue: value,
